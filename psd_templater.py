@@ -4,7 +4,7 @@ __author__ = 'Igor Fernandes'
 __version__ = '0.0.0'
 
 import click
-from commands import viewPsdLayers
+from commands import view_psd_layers
 
 
 @click.group()
@@ -13,7 +13,7 @@ def cli():
     """CLI to generate event badges from PSD templates."""
     pass
 
-cli.add_command(viewPsdLayers)
+cli.add_command(view_psd_layers)
 
 if __name__ == '__main__':
     cli()
