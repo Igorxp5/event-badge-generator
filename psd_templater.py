@@ -6,7 +6,7 @@ __author__ = 'Igor Fernandes'
 __version__ = '0.0.0'
 
 import click
-import psd_templater
+import psdtemplater
 
 
 @click.group()
@@ -23,8 +23,8 @@ def __cli():
 def __view_psd_layers(file):
     """View layers tree of a PSD file."""
     try:
-        psd_templater.view_psd_layers(file, validate_args=False)
-    except psd_templater.FileError as e:
+        psdtemplater.view_psd_layers(file, validate_args=False)
+    except psdtemplater.FileError as e:
         click.FileError(e.file, e.message)
 
 __cli.add_command(__view_psd_layers)

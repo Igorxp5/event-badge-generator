@@ -9,4 +9,5 @@ __author__ = 'Igor Fernandes'
 __version__ = '0.0.0'
 
 from .view_psd_layers import view_psd_layers, get_psd_layers_tree
+from .render_psd import render_psd
 from .exceptions import FileError
