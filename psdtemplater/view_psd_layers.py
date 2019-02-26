@@ -14,7 +14,7 @@ def view_psd_layers(file, validate_args=True):
         raise RuntimeError('Expected a file in PSD format.')
 
     tree = get_psd_layers_tree(psd, f'PSD: {file}')
-    tree.show(key=lambda node: node.data, reverse=True)
+    tree.show(key=lambda node: node.data[0], reverse=True)
 
 
 def get_psd_layers_tree(psd, root_name=None):
@@ -30,9 +30,19 @@ def get_psd_layers_tree(psd, root_name=None):
     root_name = psd.name if not root_name else root_name
     psd.tree_alias = 'psd'
     tree = treelib.Tree()
-    tree.create_node(root_name, psd.tree_alias)
+    tree.create_node(root_name, psd.tree_alias, data=(0, psd))
     __add_layers_to_tree(tree, psd)
     return tree
+
+
+def get_all_psd_layers(psd):
+    """Get all layers of a PSD into a generator.
+
+    :param layers: PSD root or layer that will be added to the tree.
+    :type layers: psd_tools.PSDImage or psd_tools.api.layers
+    """
+    tree = get_psd_layers_tree(psd)
+    return [n.data[1] for n in tree.all_nodes_itr() if not n.is_root()]
 
 
 def __add_layers_to_tree(tree, layers):
@@ -50,7 +60,7 @@ def __add_layers_to_tree(tree, layers):
             layer.tree_alias = layer.layer_id
             exhibition = (f'{layer.name}' +
                           f'(Id: {layer.layer_id}, Type={layer_type})')
-            tree.create_node(exhibition, layer.layer_id, data=index,
+            tree.create_node(exhibition, layer.layer_id, data=(index, layer),
                              parent=layers.tree_alias)
             __add_layers_to_tree(tree, layer)
 
