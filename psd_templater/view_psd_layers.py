@@ -1,22 +1,17 @@
-"""View layers tree of a PSD file."""
-
-__author__ = 'Igor Fernandes'
-__version__ = '0.0.0'
-
-import click
 import treelib
+from pathlib import Path
 from psd_tools import PSDImage
 from collections.abc import Iterable
 
 
-@click.command('view-psd-layers')
-@click.argument('file', type=click.Path(exists=True, dir_okay=False))
-def view_psd_layers(file):
+def view_psd_layers(file, validate_args=True):
     """View layers tree of a PSD file."""
+    if validate_args:
+        __view_psd_layers_validation(file)
     try:
         psd = PSDImage.open(file)
     except:
-        raise click.FileError(file, 'Expected a file in PSD format.')
+        raise RuntimeError('Expected a file in PSD format.')
 
     tree = get_psd_layers_tree(psd, f'PSD: {file}')
     tree.show(key=lambda node: node.data, reverse=True)
@@ -36,11 +31,11 @@ def get_psd_layers_tree(psd, root_name=None):
     psd.tree_alias = 'psd'
     tree = treelib.Tree()
     tree.create_node(root_name, psd.tree_alias)
-    add_layers_to_tree(tree, psd)
+    __add_layers_to_tree(tree, psd)
     return tree
 
 
-def add_layers_to_tree(tree, layers):
+def __add_layers_to_tree(tree, layers):
     """Add layers and sub-layers to a tree.
 
     :param tree: Tree to which layers will be added.
@@ -57,4 +52,10 @@ def add_layers_to_tree(tree, layers):
                           f'(Id: {layer.layer_id}, Type={layer_type})')
             tree.create_node(exhibition, layer.layer_id, data=index,
                              parent=layers.tree_alias)
-            add_layers_to_tree(tree, layer)
+            __add_layers_to_tree(tree, layer)
+
+
+def __view_psd_layers_validation(file):
+    file_path = Path(file)
+    if not file_path.is_file() or not file_path.exists():
+        raise RuntimeError('The path must be a PSD file.')
