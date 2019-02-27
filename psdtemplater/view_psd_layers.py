@@ -3,13 +3,16 @@ from pathlib import Path
 from psd_tools import PSDImage
 from collections.abc import Iterable
 
-from .util import raise_if_not_psd_file
+from .util import get_psd_or_raise
 
 
 def view_psd_layers(file):
-    """View layers tree of a PSD file."""
-    raise_if_not_psd_file(file)
-    psd = PSDImage.open(file)
+    """View layers tree of a PSD file.
+
+    :param file: PSD file path
+    :type file: str
+    """
+    psd = get_psd_or_raise(file)
     tree = get_psd_layers_tree(psd, f'PSD: {file}')
     tree.show(key=lambda node: node.data[0], reverse=True)
 

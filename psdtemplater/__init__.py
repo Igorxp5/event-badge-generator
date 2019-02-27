@@ -15,11 +15,12 @@ from .constants import AVAILABLE_OUTPUT_FILE_EXTENSIONS,\
 # Modules
 from .view_psd_layers import view_psd_layers, get_psd_layers_tree,\
     get_all_psd_layers
-from .render_psd import render_psd
-from .create_template import create_template
+from .render_psd import render_psd, render_text, insert_pil_image
+from .create_template import create_template, PSDLayer
+from .apply_template import apply_template
 
 # Utils
-from .util import raise_if_not_psd_file
+from .util import get_psd_or_raise
 
 # Exceptions
-from .exceptions import FileError
+from .exceptions import FileError, FontNotFoundError, FieldNotFilled

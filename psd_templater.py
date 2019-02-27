@@ -38,9 +38,8 @@ def __view_psd_layers(file):
               help='Layer ID that will not be redered. '
               'Run \'view-psd-layers\' command to see id of each layer. '
               'This option can be called more than once to add more layers.')
-@click.option('-os', '--original-size',
-              default=False, is_flag=True,
-              help='Keep width and height equals to PSD.')
+@click.option('--original-size/--no-original-size', default=True,
+              help='Don\'t keep width and height equals to PSD.')
 def __render_psd(file, output, exclude_layer, original_size):
     """Compose PSD to one of the following formats: png, pdf."""
     image = psdtemplater.render_psd(file, exclude_layer,

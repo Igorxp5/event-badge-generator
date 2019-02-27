@@ -1,7 +1,8 @@
 from pathlib import Path
+from psd_tools import PSDImage
 
 
-def raise_if_not_psd_file(file):
+def get_psd_or_raise(file):
     """Return if a path is a psd file.
 
     :param file: path to file
@@ -12,5 +13,7 @@ def raise_if_not_psd_file(file):
         raise RuntimeError('The path is not a file.')
     if not file_path.exists():
         raise RuntimeError('File doesn\'t exist.')
-    if file_path.suffix != '.psd':
+    try:
+        return PSDImage.open(file)
+    except:
         raise RuntimeError('The path must be a PSD file.')
