@@ -24,7 +24,7 @@ def __cli():
 def __view_psd_layers(file):
     """View layers tree of a PSD file."""
     try:
-        psdtemplater.view_psd_layers(file, validate_args=False)
+        psdtemplater.view_psd_layers(file)
     except psdtemplater.FileError as e:
         raise click.FileError(e.file, e.message)
 
@@ -44,8 +44,7 @@ def __view_psd_layers(file):
 def __render_psd(file, output, exclude_layer, original_size):
     """Compose PSD to one of the following formats: png, pdf."""
     image = psdtemplater.render_psd(file, exclude_layer,
-                                    original_size=original_size,
-                                    validate_args=False)
+                                    original_size=original_size)
     file_path = Path(file)
     output_path = Path(output)
     if output_path.is_dir():

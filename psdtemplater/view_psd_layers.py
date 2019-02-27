@@ -3,16 +3,13 @@ from pathlib import Path
 from psd_tools import PSDImage
 from collections.abc import Iterable
 
+from .util import raise_if_not_psd_file
 
-def view_psd_layers(file, validate_args=True):
+
+def view_psd_layers(file):
     """View layers tree of a PSD file."""
-    if validate_args:
-        __view_psd_layers_validation(file)
-    try:
-        psd = PSDImage.open(file)
-    except:
-        raise RuntimeError('Expected a file in PSD format.')
-
+    raise_if_not_psd_file(file)
+    psd = PSDImage.open(file)
     tree = get_psd_layers_tree(psd, f'PSD: {file}')
     tree.show(key=lambda node: node.data[0], reverse=True)
 
@@ -63,9 +60,3 @@ def __add_layers_to_tree(tree, layers):
             tree.create_node(exhibition, layer.layer_id, data=(index, layer),
                              parent=layers.tree_alias)
             __add_layers_to_tree(tree, layer)
-
-
-def __view_psd_layers_validation(file):
-    file_path = Path(file)
-    if not file_path.is_file() or not file_path.exists():
-        raise RuntimeError('The path must be a PSD file.')

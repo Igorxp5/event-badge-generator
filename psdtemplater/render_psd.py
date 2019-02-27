@@ -5,6 +5,7 @@ from psd_tools import PSDImage, compose
 from PIL import Image, ImageDraw, ImageFont, ImageChops
 
 from .view_psd_layers import get_all_psd_layers
+from .util import raise_if_not_psd_file
 
 
 class ColorMode(Enum):
@@ -18,7 +19,7 @@ class ColorMode(Enum):
 
 
 def render_psd(file, excluded_layers=tuple(),
-               original_size=False, validate_args=True):
+               original_size=False):
     """Render a PSD file into PIL Image.
 
     :param file: File path to PSD Image.
@@ -28,8 +29,7 @@ def render_psd(file, excluded_layers=tuple(),
     :param original_size: Keep original PSD size flag.
     :type bool
     """
-    if validate_args:
-        __render_psd_validation(file, excluded_layers)
+    raise_if_not_psd_file(file)
 
     file_path = Path(file)
     psd = PSDImage.open(file_path)
@@ -45,7 +45,7 @@ def render_psd(file, excluded_layers=tuple(),
 
 def __compose_layers(psd, layers, original_size):
     """Compose layers into a PIL.Image."""
-    color_mode = ColorMode.__dict__[psd.color_mode]
+    color_mode = ColorMode[psd.color_mode]
     size = size = psd.size
     if not original_size:
         width, height = 0, 0
@@ -71,9 +71,3 @@ def __insert_pil_image(to_image, from_image, position):
     dest = (max(0, top), max(0, left))
     source = (abs(min(0, top)), abs(min(0, left)))
     to_image.alpha_composite(from_image, dest, source)
-
-
-def __render_psd_validation(file, exclude_layer):
-    file_path = Path(file)
-    if not file_path.is_file() or not file_path.exists():
-        raise RuntimeError('The path must be a PSD file.')
