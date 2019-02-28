@@ -1,36 +1,32 @@
-from enum import Enum
 from pathlib import Path
 from psd_tools import PSDImage, compose
 
 from .constants import *
-from .view_psd_layers import get_all_psd_layers
+from .classes import PSDLayer
 from .render_psd import ColorMode
+from .apply_template import get_text_layer_properties, TextLayerAlignment,\
+    CharSequenceCase, FontStyle
+from .view_psd_layers import get_layer_parents, get_psd_layers_dict
+from .exceptions import UsageColisionError, LayerIDNotFoundError,\
+    InvalidLayerTypeError
 from .util import get_psd_or_raise
 
 
-class PSDLayer(str, Enum):
-    """Possible PSD Layer types."""
-
-    GROUP = 'group'
-    TYPE = 'type'
-    PIXEL = 'pixel'
-
-
-def create_template(file, layer_values=None, excluded_layers=tuple()):
+def create_template(file, input_layers, excluded_layers=tuple()):
     """Create psdtemplater standard template.
 
     :param file: PSD file path
     :type file: str
-    :param layer_values: Content of the layers that will be replaced
-    when template is executed.
-    :type file: (int, str)
-    :param exclude_layers: ID of layers that must will not be replaced.
+    :param input_layers: Layers that will be used as input along with
+    content of the layers that will be replaced when template is executed.
+    :type input_layers: {int: str, ...}
+    :param exclude_layers: ID layers that mustn't be included to image.
     :type tree: tuple(int,...)
     """
     psd = get_psd_or_raise(file)
-    if layer_values and not isinstance(layer_values, dict):
-        raise TypeError('\'layer_values\' must be a dict.')
-    layer_values = dict() if not layer_values else layer_values
+    if input_layers and not isinstance(input_layers, dict):
+        raise TypeError('\'input_layers\' must be a dict.')
+    input_layers = dict() if not input_layers else input_layers
 
     file_path = Path(file)
     template = {}
@@ -39,19 +35,57 @@ def create_template(file, layer_values=None, excluded_layers=tuple()):
     template[TEMPLATE_KEY_PSD_COLOR_MODE] = ColorMode[psd.color_mode]
     template[TEMPLATE_KEY_IMAGE_SIZE] = psd.size
     input_fields = []
-    layers = get_all_psd_layers(psd)
-    for layer in layers:
-        if PSDLayer(layer.kind) is not PSDLayer.GROUP \
-                and layer.layer_id not in excluded_layers:
-            input_field = {}
-            input_field[TEMPLATE_KEY_INPUT_FIELD_LAYER_ID] = layer.layer_id
-            input_field[TEMPLATE_KEY_INPUT_FIELD_TYPE] = PSDLayer(layer.kind)
-            field_value = layer_values.get(layer.layer_id, layer.name)
-            field_value = '{{' + field_value + '}}'
-            input_field[TEMPLATE_KEY_INPUT_FIELD_VALUE] = field_value
-            input_field[TEMPLATE_KEY_INPUT_FIELD_POSITION] = layer.offset
-            input_field[TEMPLATE_KEY_INPUT_FIELD_SIZE] = layer.size
-            input_fields.append(input_field)
+    layers = get_psd_layers_dict(psd)
+    for layer_id, value in input_layers.items():
+        try:
+            layer = layers[layer_id]
+        except KeyError:
+            raise LayerIDNotFoundError(layer_id)
+
+        layer_parent_ids = [p.layer_id for p in get_layer_parents(psd, layer)]
+
+        layer_type = PSDLayer(layer.kind)
+        if layer_type is PSDLayer.GROUP:
+            raise InvalidLayerType(
+                'Can\'t use a group type layer as input field.'
+            )
+        if layer.layer_id in excluded_layers \
+                or any((p_id in excluded_layers for p_id in layer_parent_ids)):
+            raise UsageColisionError(
+                'Can\'t use input field as a excluded layer or '
+                'that has a excluded parent.'
+            )
+
+        input_field = {}
+        input_field[TEMPLATE_KEY_INPUT_FIELD_LAYER_ID] = layer.layer_id
+        input_field[TEMPLATE_KEY_INPUT_FIELD_TYPE] = PSDLayer(layer.kind)
+        field_value = input_layers.get(layer.layer_id, layer.name)
+        field_value = '{{' + field_value + '}}'
+        input_field[TEMPLATE_KEY_INPUT_FIELD_VALUE] = field_value
+        input_field[TEMPLATE_KEY_INPUT_FIELD_POSITION] = layer.offset
+        input_field[TEMPLATE_KEY_INPUT_FIELD_SIZE] = layer.size
+
+        input_field[TEMPLATE_KEY_INPUT_FIELD_TYPE_PROPERTIES] = {}
+        if layer_type is PSDLayer.TYPE:
+            font_name, font_size, fill_color = get_text_layer_properties(layer)
+            alignment = TextLayerAlignment.get_text_layer_alignment(layer)
+            font_styles = FontStyle.get_font_styles(layer)
+            char_case = CharSequenceCase.get_char_sequence_case(layer.text)
+            input_field[TEMPLATE_KEY_INPUT_FIELD_TYPE_PROPERTIES] = {
+                TEMPLATE_KEY_INPUT_FIELD_TEXT_FONT: font_name,
+                TEMPLATE_KEY_INPUT_FIELD_TEXT_FONT_SIZE: font_size,
+                TEMPLATE_KEY_INPUT_FIELD_TEXT_ALIGNMENT: alignment,
+                TEMPLATE_KEY_INPUT_FIELD_TEXT_FONT_STYLE: font_styles,
+                TEMPLATE_KEY_INPUT_FIELD_TEXT_CHAR_CASE: char_case,
+            }
+
+        input_fields.append(input_field)
+
+    # Check if all excluded_layers exists.
+    for layer_id in excluded_layers:
+        if layer_id not in layers:
+            raise LayerIDNotFoundError(layer_id)
 
     template[TEMPLATE_KEY_INPUT_FIELDS] = input_fields
+    template[TEMPLATE_KEY_EXCLUDED_LAYERS] = excluded_layers
     return template

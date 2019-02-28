@@ -1,25 +1,14 @@
 import re
-from enum import Enum
 from pathlib import Path
 from PIL import Image, ImageFont
 from psd_tools import PSDImage
 
 from .constants import *
+from .classes import TextLayerAlignment, CharSequenceCase, FontStyle
 from .view_psd_layers import get_all_psd_layers
 from .render_psd import ColorMode, render_psd, render_text, insert_pil_image
-from .create_template import PSDLayer
 from .util import get_psd_or_raise
-from .exceptions import FontNotFoundError, FieldNotFilled
-
-
-class TextLayerAlignment(Enum):
-    """Represents text layer aligment, present in
-    the 'Justification' property of the layer.
-    """
-
-    LEFT = 1
-    CENTER = 2
-    RIGHT = 3
+from .exceptions import FontNotFoundError, FieldNotFilledError
 
 
 def apply_template(template, content_values, excluded_layers=tuple(),
@@ -57,7 +46,7 @@ def apply_template(template, content_values, excluded_layers=tuple(),
                 text = __get_text_field(field, layer, content_values)
 
                 if not ignore_not_filled_fields and text == layer.text:
-                    raise FieldNotFilled(layer.name)
+                    raise FieldNotFilledError(layer.name)
 
                 layer_image = __get_image_type_field(
                     color_mode, fonts, field, layer, text
@@ -77,7 +66,7 @@ def apply_template(template, content_values, excluded_layers=tuple(),
                     excluded_layers.append(layer.layer_id)
                     layer_images.append((field, layer, layer_image))
                 elif not ignore_not_filled_fields:
-                    raise FieldNotFilled(layer.name)
+                    raise FieldNotFilledError(layer.name)
 
     final_image = render_psd(
         psd_file_path, excluded_layers, original_size=True
@@ -106,7 +95,10 @@ def __get_layer_by_id(layers, id_):
         raise KeyError('ID does not exist.')
 
 
-def __get_text_layer_properties(text_layer):
+def get_text_layer_properties(text_layer):
+    """Get properties of text layer: Font name, Font size,
+    Text Alignment and Fill color.
+    """
     fontset = text_layer.resource_dict['FontSet']
     rundata = text_layer.engine_dict['StyleRun']['RunArray']
     stylesheet = rundata[0]['StyleSheet']['StyleSheetData']
@@ -114,7 +106,7 @@ def __get_text_layer_properties(text_layer):
     fill_color = stylesheet['FillColor']['Values']
     fill_color = tuple([int(fill_color[i] * 255) for i in range(1, 3 + 1)])
     fill_color += (int(stylesheet['FillColor']['Values'][0] * 255),)
-    font_name = fontset[stylesheet['Font']]['Name']
+    font_name = str(fontset[stylesheet['Font']]['Name'])
     return (font_name, float(font_size), fill_color)
 
 
@@ -156,21 +148,17 @@ def __apply_text_layer_filter(text_layer, text):
     lowercase or capitalize.
     """
     filtered_text = text
-    if text_layer.text.isupper():
-        filtered_text = text.upper()
-    elif text_layer.text.islower():
-        filtered_text = text.lower()
-    elif text_layer.text.istitle():
-        filtered_text = text.title()
+    char_sequence_case = CharSequenceCase.get_char_sequence_case(
+        text_layer.text
+    )
+    if char_sequence_case:
+        filtered_text = char_sequence_case(text)
     return filtered_text
 
 
 def __get_text_poisition_by_aligment(text_layer, layer_image):
     """Return text position based o original alignment."""
-    runarray = text_layer.engine_dict['ParagraphRun']['RunArray']
-    paragraph_sheet = runarray[0]['ParagraphSheet']
-    justification = paragraph_sheet['Properties']['Justification']
-    justification = TextLayerAlignment(justification)
+    justification = TextLayerAlignment.get_text_layer_alignment(text_layer)
     position = None
     if justification is TextLayerAlignment.LEFT:
         position = text_layer.offset
