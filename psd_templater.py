@@ -41,7 +41,7 @@ def __view_psd_layers(file):
 @click.option('--original-size/--no-original-size', default=True,
               help='Don\'t keep width and height equals to PSD.')
 def __render_psd(file, output, exclude_layer, original_size):
-    """Compose PSD to one of the following formats: png, pdf."""
+    """Compose PSD to PNG."""
     image = psdtemplater.render_psd(file, exclude_layer,
                                     original_size=original_size)
     file_path = Path(file)

@@ -1,7 +1,7 @@
 """psd_templater.py
 
 This package provides tools to generate templates from a PSD file
-to render from it PNG, PDF or JPG files changing some field defined
+to render from it PNG file changing some field defined
 in the template. Rendering can be done in bulk through a CSV or JSON file.
 """
 
