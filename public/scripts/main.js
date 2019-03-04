@@ -1,6 +1,16 @@
 let socket = io.connect('http://' + document.domain + ':' + location.port);
+
 socket.on('connect', function () {
     console.log('connected');
+});
+
+socket.on('unavailable_fonts', function(data) {
+    console.log(data);
+});
+var result = undefined;
+socket.on('psd_layers', function (data) {
+    result = data;
+    console.log(data);
 });
 
 $('#psd-file').change(function() {
@@ -9,7 +19,6 @@ $('#psd-file').change(function() {
     let reader = new FileReader();
     reader.onload = function() {
         let data = Array.from(new Uint8Array(reader.result));
-        console.dir(data);
         socket.emit('send_psd', data);
     }
     let fileURL = $(this)[0].files[0];

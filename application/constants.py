@@ -1,0 +1,5 @@
+IO_CLIENT_PSD = 'psd'
+IO_CLIENT_PSD_DATA = 'psd_data'
+IO_CLIENT_PSD_FONTS = 'psd_fonts'
+IO_CLIENT_PSD_TEMPLATE = 'psd_template'
+IO_CLIENT_PSD_FILE_PATH = 'psd_file_path'
