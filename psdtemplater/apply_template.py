@@ -1,18 +1,18 @@
 import re
 from pathlib import Path
-from PIL import Image, ImageFont
 from psd_tools import PSDImage
+from PIL import Image, ImageFont
 
 from .constants import *
-from .classes import TextLayerAlignment, CharSequenceCase, FontStyle
-from .view_psd_layers import get_all_psd_layers
-from .render_psd import ColorMode, render_psd, render_text, insert_pil_image
 from .util import get_psd_or_raise
+from .view_psd_layers import get_all_psd_layers
+from .create_template import get_text_layer_properties
 from .exceptions import FontNotFoundError, FieldNotFilledError
+from .render_psd import ColorMode, render_psd, render_text, insert_pil_image
+from .classes import PSDLayer, TextLayerAlignment, CharSequenceCase, FontStyle
 
 
-def apply_template(template, content_values, excluded_layers=tuple(),
-                   resize_pixel_layers=True, ignore_not_filled_fields=True):
+def apply_template(template, content_values, resize_pixel_layers=True):
     """Apply template created by module 'create_template',
     replacing images and texts with values passed as parameter.
 
@@ -20,12 +20,8 @@ def apply_template(template, content_values, excluded_layers=tuple(),
     :type template: dict
     :param content_values: Dicts of tags that should be replaced in layers.
     :type content_values: dict
-    :param exclude_layers: ID layers that mustn't be included to image.
-    :type tree: tuple(int,...)
     :param resize_pixel_layers: Enable resize pixel layers replaced.
     :type resize_pixel_layers: bool
-    :param ignore_not_filled_fields: Don't Raise if the field is not filled.
-    :type ignore_not_filled_fields: bool
     """
     psd_file_path = Path(template[TEMPLATE_KEY_PSD_FILE])
     color_mode = ColorMode(template[TEMPLATE_KEY_PSD_COLOR_MODE])
@@ -34,39 +30,32 @@ def apply_template(template, content_values, excluded_layers=tuple(),
     layers = get_all_psd_layers(psd)
     # fonts dict to avoid create many instances of same font
     fonts = {}
-    excluded_layers = list(excluded_layers)
+    excluded_layers = list(template[TEMPLATE_KEY_EXCLUDED_LAYERS])
+    input_fields = template[TEMPLATE_KEY_INPUT_FIELDS]
     layer_images = []
-    for field in template[TEMPLATE_KEY_INPUT_FIELDS]:
+    for field in input_fields:
+        input_value = None
+        try:
+            input_value = __get_field_value(field, content_values)
+        except KeyError:
+            raise FieldNotFilledError(field['value'])
+
         layer = __get_layer_by_id(
             layers, field[TEMPLATE_KEY_INPUT_FIELD_LAYER_ID]
         )
-        layer_image = None
-        if layer.layer_id not in excluded_layers:
-            if PSDLayer(layer.kind) is PSDLayer.TYPE:
-                text = __get_text_field(field, layer, content_values)
-
-                if not ignore_not_filled_fields and text == layer.text:
-                    raise FieldNotFilledError(layer.name)
-
-                layer_image = __get_image_type_field(
-                    color_mode, fonts, field, layer, text
-                )
-                excluded_layers.append(layer.layer_id)
-                layer_images.append((field, layer, layer_image))
-            elif PSDLayer(layer.kind) is PSDLayer.PIXEL:
-                layer_image = None
-                if ignore_not_filled_fields:
-                    try:
-                        layer_image = __get_image_from_field(
-                            field, content_values
-                        )
-                    except:
-                        layer_image = None
-                if layer_image:
-                    excluded_layers.append(layer.layer_id)
-                    layer_images.append((field, layer, layer_image))
-                elif not ignore_not_filled_fields:
-                    raise FieldNotFilledError(layer.name)
+        if PSDLayer(layer.kind) is PSDLayer.TYPE:
+            text = __apply_text_layer_filter(layer, input_value)
+            text_layer_properties = get_text_layer_properties(layer)
+            font, font_size, fill_color = text_layer_properties
+            layer_image = __get_image_type_field(
+                color_mode, fonts, field, layer, text
+            )
+            excluded_layers.append(layer.layer_id)
+            layer_images.append((field, layer, layer_image))
+        elif PSDLayer(layer.kind) is PSDLayer.PIXEL:
+            layer_image = Image.open(input_value)
+            excluded_layers.append(layer.layer_id)
+            layer_images.append((field, layer, layer_image))
 
     final_image = render_psd(
         psd_file_path, excluded_layers, original_size=True
@@ -95,33 +84,18 @@ def __get_layer_by_id(layers, id_):
         raise KeyError('ID does not exist.')
 
 
-def get_text_layer_properties(text_layer):
-    """Get properties of text layer: Font name, Font size,
-    Text Alignment and Fill color.
-    """
-    fontset = text_layer.resource_dict['FontSet']
-    rundata = text_layer.engine_dict['StyleRun']['RunArray']
-    stylesheet = rundata[0]['StyleSheet']['StyleSheetData']
-    font_size = stylesheet['FontSize']
-    fill_color = stylesheet['FillColor']['Values']
-    fill_color = tuple([int(fill_color[i] * 255) for i in range(1, 3 + 1)])
-    fill_color += (int(stylesheet['FillColor']['Values'][0] * 255),)
-    font_name = str(fontset[stylesheet['Font']]['Name'])
-    return (font_name, float(font_size), fill_color)
-
-
-def __get_text_field(field, layer, content_values):
-    text = field[TEMPLATE_KEY_INPUT_FIELD_VALUE]
-    text = re.sub(
+def __get_field_value(field, content_values):
+    value = field[TEMPLATE_KEY_INPUT_FIELD_VALUE]
+    value = re.sub(
         TEMPLATE_REPLACE_PATTERN,
-        lambda match: content_values.get(match.group(1), layer.text),
-        text
+        lambda match: content_values[match.group(1)],
+        value
     )
-    return __apply_text_layer_filter(layer, text)
+    return value
 
 
 def __get_image_type_field(color_mode, fonts, field, layer, text):
-    text_properties = __get_text_layer_properties(layer)
+    text_properties = get_text_layer_properties(layer)
     font_name, font_size, fill_color = text_properties
     font = None
     try:
@@ -140,6 +114,7 @@ def __get_image_type_field(color_mode, fonts, field, layer, text):
             )
         except OSError:
             raise FontNotFoundError(font_name)
+    fonts[text_properties[0]] = font
     return render_text(color_mode, text, font, fill_color)
 
 

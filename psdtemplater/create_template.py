@@ -2,17 +2,15 @@ from pathlib import Path
 from psd_tools import PSDImage, compose
 
 from .constants import *
-from .classes import PSDLayer
 from .render_psd import ColorMode
-from .apply_template import get_text_layer_properties, TextLayerAlignment,\
-    CharSequenceCase, FontStyle
+from .util import get_psd_or_raise
 from .view_psd_layers import get_layer_parents, get_psd_layers_dict
+from .classes import PSDLayer, TextLayerAlignment, CharSequenceCase, FontStyle
 from .exceptions import UsageColisionError, LayerIDNotFoundError,\
     InvalidLayerTypeError
-from .util import get_psd_or_raise
 
 
-def create_template(file, input_layers, excluded_layers=tuple()):
+def create_template(file, input_layers, title=None, excluded_layers=tuple()):
     """Create psdtemplater standard template.
 
     :param file: PSD file path
@@ -20,17 +18,22 @@ def create_template(file, input_layers, excluded_layers=tuple()):
     :param input_layers: Layers that will be used as input along with
     content of the layers that will be replaced when template is executed.
     :type input_layers: {int: str, ...}
+    :param title: Template title.
+    :type title: str
     :param exclude_layers: ID layers that mustn't be included to image.
     :type tree: tuple(int,...)
     """
+    file_path = Path(file)
     psd = get_psd_or_raise(file)
     if input_layers and not isinstance(input_layers, dict):
         raise TypeError('\'input_layers\' must be a dict.')
     input_layers = dict() if not input_layers else input_layers
 
-    file_path = Path(file)
+    if not title:
+        title = file_path.stem
+
     template = {}
-    template[TEMPLATE_KEY_NAME] = file_path.stem
+    template[TEMPLATE_KEY_TITLE] = title
     template[TEMPLATE_KEY_PSD_FILE] = str(file_path.resolve())
     template[TEMPLATE_KEY_PSD_COLOR_MODE] = ColorMode[psd.color_mode]
     template[TEMPLATE_KEY_IMAGE_SIZE] = psd.size
@@ -89,3 +92,18 @@ def create_template(file, input_layers, excluded_layers=tuple()):
     template[TEMPLATE_KEY_INPUT_FIELDS] = input_fields
     template[TEMPLATE_KEY_EXCLUDED_LAYERS] = excluded_layers
     return template
+
+
+def get_text_layer_properties(text_layer):
+    """Get properties of text layer: Font name, Font size,
+    Text Alignment and Fill color.
+    """
+    fontset = text_layer.resource_dict['FontSet']
+    rundata = text_layer.engine_dict['StyleRun']['RunArray']
+    stylesheet = rundata[0]['StyleSheet']['StyleSheetData']
+    font_size = stylesheet['FontSize']
+    fill_color = stylesheet['FillColor']['Values']
+    fill_color = tuple([int(fill_color[i] * 255) for i in range(1, 3 + 1)])
+    fill_color += (int(stylesheet['FillColor']['Values'][0] * 255),)
+    font_name = str(fontset[stylesheet['Font']]['Name'])[1:-1]
+    return (font_name, float(font_size), fill_color)

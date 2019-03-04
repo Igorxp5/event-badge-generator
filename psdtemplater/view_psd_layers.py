@@ -40,7 +40,13 @@ def get_psd_layers_tree(psd):
 
 
 def get_layer_parents(psd, layer):
-    """Get list of all layer parents."""
+    """Get list of all layer parents.
+
+    :param psd: PSD which will be extracted the layers.
+    :type tree: psd_tools.PSDImage or psd_tools.api.layers
+    :param layer: Layer.
+    :type layer: psd_tools.api.layers.Layer
+    """
     tree = get_psd_layers_tree(psd)
 
     def get_parents(tree, layer_):

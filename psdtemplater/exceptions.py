@@ -32,7 +32,7 @@ class FieldNotFilledError(Exception):
         """Return default message or message passed on constructor."""
         message = self.message
         if not self.message:
-            message = f'{self.field} is not filled'
+            message = f'{self.field} is not filled.'
         return message
 
 

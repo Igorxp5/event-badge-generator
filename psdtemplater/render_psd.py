@@ -4,8 +4,9 @@ from pathlib import Path
 from psd_tools import PSDImage, compose
 from PIL import Image, ImageDraw, ImageFont, ImageChops
 
-from .view_psd_layers import get_all_psd_layers
 from .util import get_psd_or_raise
+from .view_psd_layers import get_all_psd_layers, get_psd_layers_dict,\
+    get_layer_parents
 
 
 class ColorMode(str, Enum):
@@ -18,18 +19,18 @@ class ColorMode(str, Enum):
     RGB = 'RGBA'
 
 
-def render_psd(file, excluded_layers=tuple(),
-               original_size=False):
+def render_psd(psd_file, excluded_layers=tuple(),
+               original_size=True):
     """Render a PSD file into PIL Image.
 
-    :param file: File path to PSD Image.
-    :type file: str
+    :param psd_file: File path to PSD Image.
+    :type psd_file: str
     :param exclude_layers: ID layers that mustn't be included to image.
     :type tree: tuple(int,...)
     :param original_size: Keep original PSD size flag.
     :type original_size: bool
     """
-    psd = get_psd_or_raise(file)
+    psd = get_psd_or_raise(psd_file)
 
     layers = get_all_psd_layers(psd)
 
@@ -39,6 +40,28 @@ def render_psd(file, excluded_layers=tuple(),
                 layer.visible = False
 
     return __compose_layers(psd, layers, original_size)
+
+
+def render_layer(psd_file, layer_id, original_size=True):
+    """Render a layer in a PSD file, into PIL Image.
+
+    :param psd_file: File path to PSD Image.
+    :type psd_file: str
+    :param layer_id: Layout ID to render.
+    :type layer_id: int
+    :param original_size: Keep original PSD size flag.
+    :type original_size: bool
+    """
+    psd = get_psd_or_raise(psd_file)
+
+    layers = get_psd_layers_dict(psd)
+    layer_parents = get_layer_parents(psd, layers[layer_id])
+    layers_list = get_all_psd_layers(psd)
+    for layer in layers_list:
+        if layer.layer_id != layer_id and layer not in layer_parents:
+            layer.visible = False
+
+    return __compose_layers(psd, layers_list, original_size)
 
 
 def __compose_layers(psd, layers, original_size):
