@@ -24,3 +24,6 @@ TEMPLATE_KEY_INPUT_FIELD_TEXT_CHAR_CASE = 'char_case'
 
 # Template Value
 TEMPLATE_REPLACE_PATTERN = r'\{\{([^\{\}]*)\}\}'
+
+# Base64 Pattern
+BASE64_IMAGE_PATTERN = '^data:image/.+;base64,'
