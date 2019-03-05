@@ -70,24 +70,29 @@ function setListPSDLayers(layers) {
 
         for (let i = 0; i < layers.length; i++) {
             let layer = layers[i];
+            let id = layer['id'];
+            let name = layer['name'];
             let $item = $('<a href="javascript:void(0);" class="psd-layer-list-item list-group-item '
-                + 'list-group-item-action" data-layer-id="' + layer['id'] + '">'
+                + 'list-group-item-action" data-layer-id="' + id + '">'
                 + '<div class= "d-flex align-items-center justify-content-between">'
-                + '<div class="text-left">'
+                + '<div class="col-6 p-0">'
                 + '<img class="mr-3" style="width: 45px;" src="' + layer['image_data'] +'">'
-                + '<span class="text-capitalize">' + layer['name'].toLowerCase() + '</span>'
+                + '<input type="text" class="form-control d-inline-block w-auto" '
+                + 'id="psd-layer-' + id + '-tag" value="' + name + '">'
                 + '</div>'
                 + '<div class="list-psd-layer-input col-5"></div></div></a>');
             if (layer['type'] == 'pixel') {
                 let $imageInputGroup = $('<div class="input-group">'
                     + '<div class= "custom-file">'
-                    + '<input id="psd-layer-'+ layer['id'] + '" type="file" class="custom-file-input">'
-                    + '<label class="custom-file-label" for="psd-layer-' + layer['id'] + '">Escolha uma imagem</label>'
+                    + '<input id="psd-layer-'+ id + '-value" type="file" class="custom-file-input">'
+                    + '<label class="custom-file-label" for="psd-layer-' + id + '">'
+                    + 'Escolha uma imagem para ser a padrão'
+                    + '</label>'
                     + '</div></div>');
                 $imageInputGroup.appendTo($item.find('.list-psd-layer-input'));
             } else if (layer['type'] == 'type') {
-                let $textInput = $('<input type="text" class="form-control" id="psd-layer-' + layer['id'] + '" '
-                    + 'placeholder="Valor padrão do campo" required>');
+                let $textInput = $('<input type="text" class="form-control" id="psd-layer-' + id + '-value" '
+                    + 'placeholder="Valor padrão do campo">');
                 $textInput.appendTo($item.find('.list-psd-layer-input'));
             }
             htmlContent += $item.prop('outerHTML');
@@ -128,4 +133,27 @@ function excelTextToObject(text) {
         }
     }
     return result;
+}
+
+function getInputLayers() {
+    let inputs = {};
+    $listPSDLayers.children('.active').each(function() {
+        let id = parseInt($(this).data('layer-id'));
+        let tag = $(this).find('input').val();
+        inputs[id] = tag;
+    });
+    return inputs;
+}
+
+function validateToGeneratePDF() {
+    //Have at least one layer selected
+    if ($listPSDLayers.children('.active').length == 0) {
+        alertBox('Pelo menos um campo deve ser selecionado para gerar!', ALERT_DANGER);
+        return false;
+    }
+
+    let dataString = $templateContentValues.val();
+    let data = excelTextToObject(dataString);
+
+    return true;
 }

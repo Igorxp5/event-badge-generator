@@ -9,7 +9,6 @@ $inputPSD.change(function () {
     }
 
     let fileURL = $(this).prop('files')[0];
-    console.log(fileURL);
 
     if (fileURL) {
         loadingInputPSD(true);

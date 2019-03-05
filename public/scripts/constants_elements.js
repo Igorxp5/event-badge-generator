@@ -4,7 +4,7 @@ const TRANSITION_EFFECT_DURATION = 400;
 const ALERT_PRIMARY = 'primary';
 const ALERT_SUCCESS = 'success';
 const ALERT_WARNING = 'warning';
-const ALERT_DANGER = 'warning';
+const ALERT_DANGER = 'danger';
 
 //DOM Elements
 

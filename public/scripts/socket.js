@@ -1,5 +1,4 @@
 let socket = io.connect('http://' + document.domain + ':' + location.port);
-let psdData = null;
 
 socket.on('connect', function () {
     console.log('connected');
