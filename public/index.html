@@ -4,25 +4,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Ferramenta para Gerar Crachás para Eventos</title>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <title>Ferramenta para Gerar Crachás para Eventos</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+        integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
-    <input id="psd-file" type="file">
+    <header class="bg-primary shadow-sm rounded-bottom p-3 mb-5">
+        <div class="container d-flex justify-content-between">
+            <h1 class="text-white">Gerar Crachás para Eventos</h1>
+            <a href="https://blog.even3.com.br/crachas-para-eventos-academicos/"
+                class="text-white h1" title="Saiba como e por que fazer crachás para eventos!">
+                <i class="fas fa-info-circle"></i>
+            </a>
+        </div>
+    </header>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
+    <div id="body-content" class="col-12 px-4">
+        <section class="container mb-5">
+            <header class="d-flex flex-nowrap align-items-center mb-4">
+                <span class="bg-primary rounded-circle shadow-sm h5 d-flex flex-column
+                    justify-content-center flex-shrink-0 m-0 mr-3" style="width: 45px; height: 45px;">
+                    <strong class="text-white text-center">1</strong>
+                </span>
+                <div>
+                    <h2 class="h4 m-0">Definir Modelo</h2>
+                    <h3 class="h5 text-secondary d-block m-0">
+                        Faça upload de um modelo em PSD.
+                    </h3>
+                </div>
+            </header>
+            <div id="upload-container" class="row text-center">
+                <div class="col-6 p-5 border-right">
+                    <div id="input-psd-container">
+                        <input type="file" id="input-psd" accept=".psd" class="d-none">
+                        <label for="input-psd" class="btn btn-primary shadow-sm" style="cursor: pointer;">
+                            Enviar um Modelo PSD
+                        </label>
+                    </div>
+                    <div id="loading-input-psd" class="spinner-border text-primary d-none"></div>
+                </div>
+                <div class="col-6 p-5">
+                    <button id="btn-open-template-gallery" type="button" class="btn btn-primary shadow-sm">
+                        Escolher um Modelo da Galeria
+                    </button>
+                </div>
+            </div>
+            <div id="psd-image-container" class="container p-0 w-25 shadow-sm d-none">
+                <img id="psd-image" class="w-100" title="Modelo PSD" alt="Modelo PSD">
+            </div>
+        </section>
+
+        <section class="container mb-5">
+            <header class="d-flex flex-nowrap align-items-center mb-4">
+                <span class="bg-primary rounded-circle shadow-sm h5 d-flex flex-column
+                            justify-content-center flex-shrink-0 m-0 mr-3" style="width: 45px; height: 45px;">
+                    <strong class="text-white text-center">2</strong>
+                </span>
+                <div>
+                    <h2 class="h4 m-0">Selecionar Campos</h2>
+                    <h3 class="h5 text-secondary d-block m-0">
+                        Selecione os campos que serão modificados, você pode definir também valores padrões para os campos.
+                    </h3>
+                </div>
+            </header>
+            <div class="row text-center">
+                <div class="col-12">
+                    <div id="no-layers-yet" class="col-12 py-3">
+                        Ainda não foi escolhido o PSD. Faça o upload do PSD ou escolha uma da galeria antes.
+                    </div>
+                    <div id="list-psd-layers" class="list-group col-12 text-left"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container mb-5">
+            <header class="d-flex flex-nowrap align-items-center mb-4">
+                <span class="bg-primary rounded-circle shadow-sm h5 d-flex flex-column
+                            justify-content-center flex-shrink-0 m-0 mr-3" style="width: 45px; height: 45px;">
+                    <strong class="text-white text-center">3</strong>
+                </span>
+                <div>
+                    <h2 class="h4 m-0">Importar Participantes</h2>
+                    <h3 class="h5 text-secondary d-block m-0">
+                        Copie os dados dos participantes de uma planilha, e cole aqui. Os dados
+                        devem conter as mesmas informações escolhidas no modelo.
+                    </h3>
+                </div>
+            </header>
+            <div class="row">
+                <textarea id="template-content-values" class="form-control shadow-inside-sm" rows="10"></textarea>
+            </div>
+        </section>
+
+        <section class="d-flex container text-center pb-5">
+            <div class="col-6">
+                <button id="btn-generate-pdf" type="button" class="btn btn-primary shadow-sm">
+                    Gerar PDF
+                </button>
+                <div id="loading-generate-psd" class="spinner-border text-primary d-none"></div>
+            </div>
+            <div class="col-6">
+                <button id="reset-application" type="button" class="btn btn-primary shadow-sm">
+                    Utlizar outro Modelo
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
         crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
-    <script type="text/javascript" src="scripts/main.js"></script>
+    <script type="text/javascript" src="scripts/constants_elements.js"></script>
+    <script type="text/javascript" src="scripts/functionalities.js"></script>
+    <script type="text/javascript" src="scripts/handle_components.js"></script>
+    <script type="text/javascript" src="scripts/socket.js"></script>
 </body>
 </html>
