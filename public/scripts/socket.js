@@ -13,6 +13,13 @@ socket.on('psd_layers', function (data) {
     setListPSDLayers(data['editable_psd_layers']);
 });
 
-socket.on('pdf_file', function(data) {
+socket.on('pdf_file_progress', function(data){
+    let progress = data['progress'];
+    let progressValue = parseInt(progress * 100);
+    loadingGeneratePDF(true, progressValue);
+});
 
+socket.on('pdf_file', function(data) {
+    let url = data['url'];
+    setPDFLinkButton(true, url);
 });

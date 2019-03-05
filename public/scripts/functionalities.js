@@ -112,17 +112,23 @@ function setLayerImageSrc($layerItem, src) {
     $layerItem.find('.psd-layer-image-data').attr('src', src);
 }
 
-function loadingGeneratePDF(loadingState, callback) {
-    if (callback === undefined) {
+function loadingGeneratePDF(loadingState, percent, callback) {
+    if (!callback) {
         callback = function() {};
     }
+    if (!percent) {
+        percent = 0;
+    }
     if (loadingState) {
+        let percentString = percent + '%';
         $buttonGeneratePDF.fadeOut(TRANSITION_EFFECT_DURATION, function() {
-            $buttonGeneratePDFLoading.removeClass('d-none').hide();
-            $buttonGeneratePDFLoading.fadeIn(TRANSITION_EFFECT_DURATION, callback);
+            $buttonGeneratePDFLoadingContainer.removeClass('d-none').hide();
+            $buttonGeneratePDFLoadingContainer.css('width', percentString);
+            $buttonGeneratePDFLoadingContainer.text(percentString);
+            $buttonGeneratePDFLoadingContainer.fadeIn(TRANSITION_EFFECT_DURATION, callback);
         });
     } else {
-        $inputPSDLoading.fadeOut(TRANSITION_EFFECT_DURATION, function () {
+        $buttonGeneratePDFLoadingContainer.fadeOut(TRANSITION_EFFECT_DURATION, function () {
             $buttonGeneratePDF.fadeIn(TRANSITION_EFFECT_DURATION, callback);
             $buttonGeneratePDF.addClass('d-none');
         });
@@ -319,11 +325,24 @@ function validateToGeneratePDF() {
     return true;
 }
 
+function setPDFLinkButton(loadedState, pdf_link) {
+    if (loadedState) {
+        $buttonGeneratePDFLoadingContainer.fadeOut(TRANSITION_EFFECT_DURATION, function(){
+            $PDFFileLink.$removeClass('d-none').hide();
+            $PDFFileLink.attr('href', pdf_link);
+            $PDFFileLink.fadeIn();
+        });
+    } else {
+        $PDFFileLink.fadeOut(TRANSITION_EFFECT_DURATION, function () {
+            $buttonGeneratePDFLoadingContainer.$removeClass('d-none').hide();
+            $buttonGeneratePDFLoadingContainer.fadeIn();
+        });
+    }
+}
+
 function getPDFSize() {
-    let value = $PDFSizePreset.val();
-    let size = value.split(', ');
-    let width = parseInt($PDFSizeWidth.val(size[0]));
-    let height = parseInt($PDFSizeHeight.val(size[1]));
+    let width = parseInt($PDFSizeWidth.val());
+    let height = parseInt($PDFSizeHeight.val());
     return [width, height];
 }
 

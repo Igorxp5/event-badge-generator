@@ -152,11 +152,17 @@
             </section>
 
             <section class="d-flex container text-center pb-5">
-                <div class="col-6">
-                    <button id="btn-generate-pdf" type="button" class="btn btn-primary shadow-sm">
+                <div class="col-6 d-flex">
+                    <button id="btn-generate-pdf" type="button" class="btn btn-primary shadow-sm m-auto">
                         Gerar PDF
                     </button>
-                    <div id="loading-generate-psd" class="spinner-border text-primary d-none"></div>
+                    <a id="pdf-file-link" href="/images/noisy-texture.png"
+                        class="btn btn-primary shadow-sm m-auto d-none" download>
+                        Download PDF
+                    </a>
+                    <div id="loading-generate-psd-container" class="progress w-100 d-none">
+                        <div id="loading-generate-psd" class="progress-bar" role="progressbar" style="width: 25%;">25%</div>
+                    </div>
                 </div>
                 <div class="col-6">
                     <button id="reset-application" type="button" class="btn btn-primary shadow-sm">

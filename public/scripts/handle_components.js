@@ -31,7 +31,7 @@ $PDFSizeHeight.keyup(setPresetByPSDSizeInput);
 
 $formPSDTemplater.submit(function(event) {
     if(validateToGeneratePDF()) {
-        loadingGeneratePDF(true);
+        loadingGeneratePDF(true, 0);
         let inputLayerAndData = getInputLayersAndData();
         socket.emit('send_input_layers_data', inputLayerAndData);
     }
