@@ -1,5 +1,6 @@
 //Constants
 const TRANSITION_EFFECT_DURATION = 400;
+const ALERT_DEFAULT_TIMEOUT = 5000;
 
 const ALERT_PRIMARY = 'primary';
 const ALERT_SUCCESS = 'success';
@@ -16,6 +17,9 @@ let $inputPSD = $('#input-psd');
 let $inputPSDLoading = $('#loading-input-psd');
 let $PSDImageContainer = $('#psd-image-container');
 let $PSDImage = $('#psd-image');
+
+//Form
+let $formPSDTemplater = $('#form-psd-templater');
 
 //Layers
 let $listPSDLayers = $('#list-psd-layers');

@@ -11,15 +11,22 @@ $inputPSD.change(function () {
     let fileURL = $(this).prop('files')[0];
 
     if (fileURL) {
-        loadingInputPSD(true);
-        setTimeout(() => {
+        loadingInputPSD(true, function() {
             reader.readAsArrayBuffer(fileURL, 'utf-8');
-        }, 1000);
+        });
     } else {
         alertBox('Não foi possível realizar a leitura do arquivo!', ALERT_DANGER);
     }
 });
 
-$buttonGeneratePDF.click(function() {
+$formPSDTemplater.submit(function(event) {
+    validateToGeneratePDF();
+    let inputLayerAndData = getInputLayersAndData();
+    socket.emit('send_input_layres_data', inputLayerAndData);
+    event.preventDefault();
+    return false;
+})
 
+$buttonGeneratePDF.click(function() {
+    $formPSDTemplater.submit();
 });

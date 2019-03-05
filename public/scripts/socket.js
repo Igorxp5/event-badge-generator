@@ -13,3 +13,7 @@ socket.on('psd_layers', function (data) {
     setPSDImage(data['psd_image_data']);
     setListPSDLayers(data['editable_psd_layers']);
 });
+
+socket.on('pdf_file', function(data) {
+
+});

@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
-    <header class="bg-primary shadow-sm rounded-bottom p-3 mb-5">
+    <header class="bg-primary shadow-sm rounded-bottom p-2 mb-5">
         <div class="container d-flex justify-content-between">
             <h1 class="text-white">Gerar Crachás para Eventos</h1>
             <a href="https://blog.even3.com.br/crachas-para-eventos-academicos/"
@@ -25,97 +25,99 @@
     </header>
 
     <div id="body-content" class="col-12 px-4">
-        <section class="container mb-5">
-            <header class="d-flex flex-nowrap align-items-center mb-4">
-                <span class="bg-primary rounded-circle shadow-sm h5 d-flex flex-column
-                    justify-content-center flex-shrink-0 m-0 mr-3" style="width: 45px; height: 45px;">
-                    <strong class="text-white text-center">1</strong>
-                </span>
-                <div>
-                    <h2 class="h4 m-0">Definir Modelo</h2>
-                    <h3 class="h5 text-secondary d-block m-0">
-                        Faça upload de um modelo em PSD.
-                    </h3>
-                </div>
-            </header>
-            <div id="upload-container" class="row text-center">
-                <div class="col-6 p-5 border-right">
-                    <div id="input-psd-container">
-                        <input type="file" id="input-psd" accept=".psd" class="d-none">
-                        <label for="input-psd" class="btn btn-primary shadow-sm" style="cursor: pointer;">
-                            Enviar um Modelo PSD
-                        </label>
+        <form id="form-psd-templater">
+            <section class="container mb-5">
+                <header class="d-flex flex-nowrap align-items-center mb-4">
+                    <span class="bg-primary rounded-circle shadow-sm h5 d-flex flex-column
+                        justify-content-center flex-shrink-0 m-0 mr-3" style="width: 45px; height: 45px;">
+                        <strong class="text-white text-center">1</strong>
+                    </span>
+                    <div>
+                        <h2 class="h4 m-0">Definir Modelo</h2>
+                        <h3 class="h5 text-secondary d-block m-0">
+                            Faça upload de um modelo em PSD.
+                        </h3>
                     </div>
-                    <div id="loading-input-psd" class="spinner-border text-primary d-none"></div>
+                </header>
+                <div id="upload-container" class="row text-center">
+                    <div class="col-6 p-5 border-right">
+                        <div id="input-psd-container">
+                            <input type="file" id="input-psd" accept=".psd" class="d-none">
+                            <label for="input-psd" class="btn btn-primary shadow-sm" style="cursor: pointer;">
+                                Enviar um Modelo PSD
+                            </label>
+                        </div>
+                        <div id="loading-input-psd" class="spinner-border text-primary d-none"></div>
+                    </div>
+                    <div class="col-6 p-5">
+                        <button id="btn-open-template-gallery" type="button" class="btn btn-primary shadow-sm">
+                            Escolher um Modelo da Galeria
+                        </button>
+                    </div>
                 </div>
-                <div class="col-6 p-5">
-                    <button id="btn-open-template-gallery" type="button" class="btn btn-primary shadow-sm">
-                        Escolher um Modelo da Galeria
+                <div id="psd-image-container" class="container p-0 w-25 shadow-sm d-none">
+                    <img id="psd-image" class="w-100" title="Modelo PSD" alt="Modelo PSD">
+                </div>
+            </section>
+
+            <section class="container mb-5">
+                <header class="d-flex flex-nowrap align-items-center mb-4">
+                    <span class="bg-primary rounded-circle shadow-sm h5 d-flex flex-column
+                                justify-content-center flex-shrink-0 m-0 mr-3" style="width: 45px; height: 45px;">
+                        <strong class="text-white text-center">2</strong>
+                    </span>
+                    <div>
+                        <h2 class="h4 m-0">Selecionar Campos</h2>
+                        <h3 class="h5 text-secondary d-block m-0">
+                            Selecione os campos que serão modificados, troque o nome da camada para o nome da coluna
+                            que será usada para preenchê-la. E defina valores padrões para os campos (opcional).
+                        </h3>
+                    </div>
+                </header>
+                <div class="row text-center">
+                    <div class="col-12">
+                        <div id="no-layers-yet" class="col-12 py-3">
+                            Ainda não foi escolhido o PSD. Faça o upload do PSD ou escolha uma da galeria.
+                        </div>
+                        <div id="list-psd-layers" class="list-group col-12 text-left"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="container mb-5">
+                <header class="d-flex flex-nowrap align-items-center mb-4">
+                    <span class="bg-primary rounded-circle shadow-sm h5 d-flex flex-column
+                                justify-content-center flex-shrink-0 m-0 mr-3" style="width: 45px; height: 45px;">
+                        <strong class="text-white text-center">3</strong>
+                    </span>
+                    <div>
+                        <h2 class="h4 m-0">Importar Participantes</h2>
+                        <h3 class="h5 text-secondary d-block m-0">
+                            Copie os dados dos participantes de uma planilha, e cole aqui. Os dados
+                            devem conter a mesma quantidade de informações escolhidas no modelo,
+                            a nome das colunas deve estar presente na primeira linha.
+                        </h3>
+                    </div>
+                </header>
+                <div class="row">
+                    <textarea id="template-content-values" class="form-control shadow-inside-sm" rows="10" required></textarea>
+                </div>
+            </section>
+
+            <section class="d-flex container text-center pb-5">
+                <div class="col-6">
+                    <button id="btn-generate-pdf" type="button" class="btn btn-primary shadow-sm">
+                        Gerar PDF
+                    </button>
+                    <div id="loading-generate-psd" class="spinner-border text-primary d-none"></div>
+                </div>
+                <div class="col-6">
+                    <button id="reset-application" type="button" class="btn btn-primary shadow-sm">
+                        Novo Modelo
                     </button>
                 </div>
-            </div>
-            <div id="psd-image-container" class="container p-0 w-25 shadow-sm d-none">
-                <img id="psd-image" class="w-100" title="Modelo PSD" alt="Modelo PSD">
-            </div>
-        </section>
-
-        <section class="container mb-5">
-            <header class="d-flex flex-nowrap align-items-center mb-4">
-                <span class="bg-primary rounded-circle shadow-sm h5 d-flex flex-column
-                            justify-content-center flex-shrink-0 m-0 mr-3" style="width: 45px; height: 45px;">
-                    <strong class="text-white text-center">2</strong>
-                </span>
-                <div>
-                    <h2 class="h4 m-0">Selecionar Campos</h2>
-                    <h3 class="h5 text-secondary d-block m-0">
-                        Selecione os campos que serão modificados, troque o nome da camada para o nome da coluna
-                        que será usada para preenchê-la. E defina valores padrões para os campos (opcional).
-                    </h3>
-                </div>
-            </header>
-            <div class="row text-center">
-                <div class="col-12">
-                    <div id="no-layers-yet" class="col-12 py-3">
-                        Ainda não foi escolhido o PSD. Faça o upload do PSD ou escolha uma da galeria.
-                    </div>
-                    <div id="list-psd-layers" class="list-group col-12 text-left"></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="container mb-5">
-            <header class="d-flex flex-nowrap align-items-center mb-4">
-                <span class="bg-primary rounded-circle shadow-sm h5 d-flex flex-column
-                            justify-content-center flex-shrink-0 m-0 mr-3" style="width: 45px; height: 45px;">
-                    <strong class="text-white text-center">3</strong>
-                </span>
-                <div>
-                    <h2 class="h4 m-0">Importar Participantes</h2>
-                    <h3 class="h5 text-secondary d-block m-0">
-                        Copie os dados dos participantes de uma planilha, e cole aqui. Os dados
-                        devem conter a mesma quantidade de informações escolhidas no modelo,
-                        a nome das colunas deve estar presente na primeira linha.
-                    </h3>
-                </div>
-            </header>
-            <div class="row">
-                <textarea id="template-content-values" class="form-control shadow-inside-sm" rows="10"></textarea>
-            </div>
-        </section>
-
-        <section class="d-flex container text-center pb-5">
-            <div class="col-6">
-                <button id="btn-generate-pdf" type="button" class="btn btn-primary shadow-sm">
-                    Gerar PDF
-                </button>
-                <div id="loading-generate-psd" class="spinner-border text-primary d-none"></div>
-            </div>
-            <div class="col-6">
-                <button id="reset-application" type="button" class="btn btn-primary shadow-sm">
-                    Novo Modelo
-                </button>
-            </div>
-        </section>
+            </section>
+        </form>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
