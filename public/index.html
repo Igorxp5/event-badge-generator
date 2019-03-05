@@ -63,8 +63,55 @@
             <section class="container mb-5">
                 <header class="d-flex flex-nowrap align-items-center mb-4">
                     <span class="bg-primary rounded-circle shadow-sm h5 d-flex flex-column
-                                justify-content-center flex-shrink-0 m-0 mr-3" style="width: 45px; height: 45px;">
+                                            justify-content-center flex-shrink-0 m-0 mr-3" style="width: 45px; height: 45px;">
                         <strong class="text-white text-center">2</strong>
+                    </span>
+                    <div>
+                        <h2 class="h4 m-0">Definir Tamanho do Crachá</h2>
+                        <h3 class="h5 text-secondary d-block m-0">
+                            Escolha o tamanho da crachá em milimetros, dentre as predefinidas ou uma personalizada.
+                        </h3>
+                    </div>
+                </header>
+                <div class="row container">
+                    <div class="form-row col-12 d-flex justify-content-between">
+                        <div class="form-group col-md-4">
+                            <label for="pdf-size-preset">Predifinições</label>
+                            <select class="custom-select" id="pdf-size-preset">
+                                <option value="105, 148" selected>A6</option>
+                                <option value="74, 105">A7</option>
+                                <option value="">Personalizado</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="pdf-size-width">Largura</label>
+                            <div class="input-group mb-3">
+                                <input type="number" min="0" id="pdf-size-width" class="form-control"
+                                    placeholder="largura" required>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">mm</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="pdf-size-height">Altura</label>
+                            <div class="input-group mb-3">
+                                <input type="number" min="0" id="pdf-size-height" class="form-control"
+                                    placeholder="Altura" required>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">mm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="container mb-5">
+                <header class="d-flex flex-nowrap align-items-center mb-4">
+                    <span class="bg-primary rounded-circle shadow-sm h5 d-flex flex-column
+                                justify-content-center flex-shrink-0 m-0 mr-3" style="width: 45px; height: 45px;">
+                        <strong class="text-white text-center">3</strong>
                     </span>
                     <div>
                         <h2 class="h4 m-0">Selecionar Campos</h2>
@@ -88,7 +135,7 @@
                 <header class="d-flex flex-nowrap align-items-center mb-4">
                     <span class="bg-primary rounded-circle shadow-sm h5 d-flex flex-column
                                 justify-content-center flex-shrink-0 m-0 mr-3" style="width: 45px; height: 45px;">
-                        <strong class="text-white text-center">3</strong>
+                        <strong class="text-white text-center">4</strong>
                     </span>
                     <div>
                         <h2 class="h4 m-0">Importar Participantes</h2>

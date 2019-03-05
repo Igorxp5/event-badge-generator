@@ -9,7 +9,6 @@ socket.on('unavailable_fonts', function(data) {
 });
 
 socket.on('psd_layers', function (data) {
-    console.log(data);
     setPSDImage(data['psd_image_data']);
     setListPSDLayers(data['editable_psd_layers']);
 });

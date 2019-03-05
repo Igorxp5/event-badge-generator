@@ -1,3 +1,7 @@
+$(document).ready(function() {
+    setPDFSizeByPreset();
+});
+
 $inputPSD.change(function () {
     if (!checkConnection()) return;
 
@@ -19,10 +23,18 @@ $inputPSD.change(function () {
     }
 });
 
+$PDFSizePreset.change(setPDFSizeByPreset);
+$PDFSizeWidth.change(setPresetByPSDSizeInput);
+$PDFSizeWidth.keyup(setPresetByPSDSizeInput);
+$PDFSizeHeight.change(setPresetByPSDSizeInput);
+$PDFSizeHeight.keyup(setPresetByPSDSizeInput);
+
 $formPSDTemplater.submit(function(event) {
-    validateToGeneratePDF();
-    let inputLayerAndData = getInputLayersAndData();
-    socket.emit('send_input_layres_data', inputLayerAndData);
+    if(validateToGeneratePDF()) {
+        loadingGeneratePDF(true);
+        let inputLayerAndData = getInputLayersAndData();
+        socket.emit('send_input_layers_data', inputLayerAndData);
+    }
     event.preventDefault();
     return false;
 })

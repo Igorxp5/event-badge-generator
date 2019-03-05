@@ -2,8 +2,6 @@
 class InvalidQuantityColsError extends Error {}
 class MissingColsError extends Error {}
 
-
-//
 function checkConnection() {
     let connected = socket.connected;
     if (!connected) {
@@ -36,6 +34,31 @@ function alertBox(text, type, timeout) {
     }
 
     return $alert;
+}
+
+function setPDFSizeByPreset() {
+    let value = $PDFSizePreset.val();
+    if (value) {
+        let size = value.split(', ');
+        $PDFSizeWidth.val(size[0]);
+        $PDFSizeHeight.val(size[1]);
+    }
+}
+
+function setPresetByPSDSizeInput() {
+    let width = $PDFSizeWidth.val();
+    let height = $PDFSizeHeight.val();
+
+    if (width && height) {
+        let size = width + ', ' + height;
+        let $option = $PDFSizePreset.find('option[value="' + size + '"]')
+        if ($option.length == 1) {
+            $option[0].selected = true;
+            return;
+        }
+    }
+    let customIndex = $PDFSizePreset.find('option[value=""]').index();
+    $PDFSizePreset.prop('options')[customIndex].selected = true;
 }
 
 function loadingInputPSD(loadingState, callback) {
@@ -87,6 +110,23 @@ function loadingLayerImage($layerItem, loadingState, callback) {
 
 function setLayerImageSrc($layerItem, src) {
     $layerItem.find('.psd-layer-image-data').attr('src', src);
+}
+
+function loadingGeneratePDF(loadingState, callback) {
+    if (callback === undefined) {
+        callback = function() {};
+    }
+    if (loadingState) {
+        $buttonGeneratePDF.fadeOut(TRANSITION_EFFECT_DURATION, function() {
+            $buttonGeneratePDFLoading.removeClass('d-none').hide();
+            $buttonGeneratePDFLoading.fadeIn(TRANSITION_EFFECT_DURATION, callback);
+        });
+    } else {
+        $inputPSDLoading.fadeOut(TRANSITION_EFFECT_DURATION, function () {
+            $buttonGeneratePDF.fadeIn(TRANSITION_EFFECT_DURATION, callback);
+            $buttonGeneratePDF.addClass('d-none');
+        });
+    }
 }
 
 function setListPSDLayers(layers) {
@@ -143,7 +183,6 @@ function setListPSDLayers(layers) {
                     $layerItem.addClass('image-loaded');
                 }
                 let fileURL = $(this).prop('files')[0];
-                console.log(fileURL);
                 if (fileURL) {
                     loadingLayerImage($layerItem, true, function() {
                         reader.readAsDataURL(fileURL, 'utf-8');
@@ -216,6 +255,13 @@ function validateToGeneratePDF() {
         return false;
     }
 
+    //A size must be chosen
+    if (!($PDFSizeWidth.val() && $PDFSizeHeight.val())) {
+        alertBox('O tamanho para o PDF deve ser definido!', ALERT_DANGER);
+        return false;
+    }
+
+
     //Have at least one layer selected
     if ($listPSDLayers.children('.active').length == 0) {
         alertBox('Pelo menos um campo deve ser selecionado para gerar!', ALERT_DANGER);
@@ -231,18 +277,20 @@ function validateToGeneratePDF() {
     let inputLayers = getClientInputLayers();
     let dataString = $templateContentValues.val();
 
+    let data = [];
     try {
-        let data = excelTextToObject(dataString);
+        data = excelTextToObject(dataString);
     } catch (InvalidQuantityColsError) {
         alertBox(
-            'O campo de <strong>Import</strong> deve conter a mesma '
+            'O campo de <strong>Importar Participantes</strong> deve conter a mesma '
             + 'quantidade de campos escolhida!', ALERT_DANGER
         );
         return false;
     }
 
     if (data.length == 0) {
-        alertBox('O campo de <strong>Import</strong> não foi preenchido!', ALERT_DANGER);
+        alertBox('O campo de <strong>ImportImportar Participantes</strong> '
+            + 'não foi preenchido!', ALERT_DANGER);
         return false;
     }
 
@@ -269,6 +317,14 @@ function validateToGeneratePDF() {
     }
 
     return true;
+}
+
+function getPDFSize() {
+    let value = $PDFSizePreset.val();
+    let size = value.split(', ');
+    let width = parseInt($PDFSizeWidth.val(size[0]));
+    let height = parseInt($PDFSizeHeight.val(size[1]));
+    return [width, height];
 }
 
 function getInputLayersAndData() {
@@ -298,7 +354,8 @@ function getInputLayersAndData() {
         data.push(dataItem);
     }
 
-    result['input_values'] = inputLayers;
+    result['input_layers'] = inputLayers;
     result['data'] = data;
+    result['size'] = getPDFSize();
     return result;
 }

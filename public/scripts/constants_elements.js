@@ -20,6 +20,9 @@ let $PSDImage = $('#psd-image');
 
 //Form
 let $formPSDTemplater = $('#form-psd-templater');
+let $PDFSizePreset = $('#pdf-size-preset');
+let $PDFSizeWidth = $('#pdf-size-width');
+let $PDFSizeHeight = $('#pdf-size-height');
 
 //Layers
 let $listPSDLayers = $('#list-psd-layers');
