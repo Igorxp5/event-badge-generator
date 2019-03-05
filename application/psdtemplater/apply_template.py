@@ -1,4 +1,6 @@
 import re
+import base64
+from io import BytesIO
 from pathlib import Path
 from psd_tools import PSDImage
 from PIL import Image, ImageFont
@@ -53,7 +55,12 @@ def apply_template(template, content_values, resize_pixel_layers=True):
             excluded_layers.append(layer.layer_id)
             layer_images.append((field, layer, layer_image))
         elif PSDLayer(layer.kind) is PSDLayer.PIXEL:
-            layer_image = Image.open(input_value)
+            layer_image = None
+            if re.search(BASE64_IMAGE_PATTERN, input_value):
+                image_data = re.sub('^data:image/.+;base64,', '', input_value)
+                layer_image = Image.open(BytesIO(base64.b64decode(image_data)))
+            else:
+                layer_image = Image.open(input_value)
             excluded_layers.append(layer.layer_id)
             layer_images.append((field, layer, layer_image))
 
