@@ -2,13 +2,17 @@ import os
 import json
 import array
 from pathlib import Path
+from timeloop import Timeloop
 from application.constants import *
 from flask_socketio import SocketIO
 from tempfile import NamedTemporaryFile
+from datetime import datetime, timedelta
 from werkzeug.contrib.cache import SimpleCache
 from application import font_utils, psd_utils, utils, psdtemplater
 from flask import Flask, request, render_template, jsonify
 
+# Periodic Task Looper
+time_loop = Timeloop()
 
 # Setting Flask Server
 app = Flask(__name__, static_url_path='', static_folder=STATIC_DIR)
@@ -17,6 +21,23 @@ io = SocketIO(app)
 cache = SimpleCache()
 
 connected_clients = {}
+
+
+@time_loop.job(interval=timedelta(seconds=JOB_INTERVAL_SECONDS))
+def delete_clients(expired_time=EXPIRED_SESSION_TIME):
+    expired_clients = []
+    for sid, client in connected_clients.items():
+        delta = datetime.now() - client[IO_CLIENT_CONNECTION_START_TIME]
+        if delta.total_seconds() > expired_time:
+            expired_clients.append(sid)
+
+    for sid in expired_clients:
+        client = connected_clients[sid]
+        # Remove PSD
+        if IO_CLIENT_PSD_FILE_PATH in client:
+            os.remove(client[IO_CLIENT_PSD_FILE_PATH])
+
+        del connected_clients[sid]
 
 
 @app.route('/')
@@ -37,6 +58,8 @@ def available_fonts():
 @io.on('connect')
 def handle_connect():
     connected_clients[request.sid] = {}
+    client = connected_clients[request.sid]
+    client[IO_CLIENT_CONNECTION_START_TIME] = datetime.now()
 
 
 @io.on('send_psd')
@@ -118,20 +141,10 @@ def handle_send_data(input_layers_data):
 
     io.emit('converted_images', {'images': result})
 
-
-@io.on('disconnect')
-def handle_disconnect():
-    client = connected_clients[request.sid]
-    # Remove PSD
-    if IO_CLIENT_PSD_FILE_PATH in client:
-        os.remove(client[IO_CLIENT_PSD_FILE_PATH])
-
-    # Remove PDF
-    if IO_CLIENT_PDF_FILE_PATH in client:
-        os.remove(client[IO_CLIENT_PDF_FILE_PATH])
-
-    del connected_clients[request.sid]
-
-
 if __name__ == '__main__':
+    time_loop.start()
     io.run(app, port=3000, debug=True)
+    time_loop.stop()
+
+    # Remove remaining clients
+    delete_clients(0)
