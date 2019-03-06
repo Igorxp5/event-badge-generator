@@ -10,7 +10,7 @@ socket.on('unavailable_fonts', function(data) {
     defaultFont = data['default_font'];
     alertBox('As fontes <strong>' + unavailableFontsText + '</strong> '
         + 'não estão disponíveis para rederização. Elas foram '
-        + 'substituídas pela <strong>' + defaultFont + '</strong>.',
+        + 'substituídas pela fonte <strong>' + defaultFont + '</strong>.',
         ALERT_WARNING, 0);
 });
 
