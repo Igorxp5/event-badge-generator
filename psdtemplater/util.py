@@ -1,5 +1,6 @@
 from pathlib import Path
 from psd_tools import PSDImage
+from urllib.parse import urlparse
 
 
 def get_psd_or_raise(file):
@@ -17,3 +18,12 @@ def get_psd_or_raise(file):
         return PSDImage.open(file)
     except:
         raise RuntimeError('The path must be a PSD file.')
+
+
+def is_url(string):
+    """Return if the string is a url."""
+    try:
+        urlparse(string)
+        return True
+    except:
+        return False
