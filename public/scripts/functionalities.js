@@ -77,13 +77,24 @@ function loadingInputPSD(loadingState, callback) {
     }
 }
 
-function setPSDImage(image_data) {
+function setPSDImage(image_data, callback) {
+    if (!callback) {
+        callback = function() {};
+    }
     if (image_data) {
         loadingInputPSD(false);
         $uploadContent.fadeOut(TRANSITION_EFFECT_DURATION, function() {
             $PSDImage.attr('src', image_data)
             $PSDImageContainer.removeClass('d-none').hide();
             $PSDImageContainer.fadeIn();
+            callback();
+        });
+    } else {
+        $PSDImageContainer.fadeOut(TRANSITION_EFFECT_DURATION, function () {
+            $PSDImage.attr('src', '');
+            $PSDImageContainer.addClass('d-none');
+            $uploadContent.fadeIn();
+            callback();
         });
     }
 }
@@ -340,8 +351,12 @@ function setPDFLinkButton(loadedState, pdf_link) {
         });
     } else {
         $PDFFileLink.fadeOut(TRANSITION_EFFECT_DURATION, function () {
-            $buttonGeneratePDFLoadingContainer.$removeClass('d-none').hide();
-            $buttonGeneratePDFLoadingContainer.fadeIn();
+            $PDFFileLink.attr('href', '#');
+            $PDFFileLink.addClass('d-none');
+            $buttonGeneratePDFLoadingContainer.fadeOut(TRANSITION_EFFECT_DURATION, function() {
+                $buttonGeneratePDFLoadingContainer.addClass('d-none');
+                $buttonGeneratePDF.fadeIn(TRANSITION_EFFECT_DURATION);
+            });
         });
     }
 }
@@ -399,4 +414,16 @@ function generatePDFFromImages(images) {
     }
 
     return pdf.output('bloburl');
+}
+
+function resetApplication() {
+    $('.alert').fadeOut(function() {
+        $(this).remove();
+    });
+    setPSDImage(false, function() {
+        loadingInputPSD(false);
+    });
+    setListPSDLayers(null);
+    $templateContentValues.val('');
+    setPDFLinkButton(false);
 }

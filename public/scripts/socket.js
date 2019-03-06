@@ -31,3 +31,11 @@ socket.on('converted_images', function(data) {
     setPDFLinkButton(true, urlBlob);
     window.open(urlBlob);
 });
+
+socket.on('error', function (data) {
+    let error = data['error'];
+    if (error == 'invalid_psd_file') {
+        alertBox('O arquivo enviado não é um PSD válido!', ALERT_DANGER);
+        loadingInputPSD(false);
+    }
+});

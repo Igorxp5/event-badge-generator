@@ -43,3 +43,7 @@ $formPSDTemplater.submit(function(event) {
 $buttonGeneratePDF.click(function() {
     $formPSDTemplater.submit();
 });
+
+$resetApllication.click(function() {
+    resetApplication();
+});

@@ -36,3 +36,7 @@ let $buttonGeneratePDF = $('#btn-generate-pdf');
 let $buttonGeneratePDFLoadingContainer = $('#loading-generate-psd-container');
 let $buttonGeneratePDFLoading = $('#loading-generate-psd');
 let $PDFFileLink = $('#pdf-file-link');
+
+
+//Button to reset application
+let $resetApllication = $('#reset-application');

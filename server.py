@@ -48,7 +48,12 @@ def handle_send_psd(psd_data):
     with psd_file as file:
         file.write(psd_data)
     psd_file_path = Path(psd_file.name)
-    psd = psd_utils.getPSD(psd_file_path)
+    try:
+        psd = psd_utils.getPSD(psd_file_path)
+    except:
+        io.emit('error', {'error': 'invalid_psd_file'})
+        return
+
     psd_fonts = psd_utils.get_psd_fonts(psd)
     client[IO_CLIENT_PSD] = psd
     client[IO_CLIENT_PSD_FONTS] = psd_fonts
