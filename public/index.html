@@ -39,21 +39,14 @@
                         </h3>
                     </div>
                 </header>
-                <div id="upload-container" class="row text-center">
-                    <div class="col-6 p-5 border-right">
-                        <div id="input-psd-container">
-                            <input type="file" id="input-psd" accept=".psd" class="d-none">
-                            <label for="input-psd" class="btn btn-primary shadow-sm" style="cursor: pointer;">
-                                Enviar um Modelo PSD
-                            </label>
-                        </div>
-                        <div id="loading-input-psd" class="spinner-border text-primary d-none"></div>
+                <div id="upload-container" class="row col-12 p-5">
+                    <div id="input-psd-container" class="m-auto">
+                        <input type="file" id="input-psd" accept=".psd" class="d-none">
+                        <label for="input-psd" class="btn btn-primary shadow-sm" style="cursor: pointer;">
+                            Enviar um Modelo PSD
+                        </label>
                     </div>
-                    <div class="col-6 p-5">
-                        <button id="btn-open-template-gallery" type="button" class="btn btn-primary shadow-sm">
-                            Escolher um Modelo da Galeria
-                        </button>
-                    </div>
+                    <div id="loading-input-psd" class="spinner-border text-primary m-auto d-none"></div>
                 </div>
                 <div id="psd-image-container" class="container p-0 w-25 shadow-sm d-none">
                     <img id="psd-image" class="w-100" title="Modelo PSD" alt="Modelo PSD">
