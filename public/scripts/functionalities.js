@@ -103,16 +103,16 @@ function loadingLayerImage($layerItem, loadingState, callback) {
     if (callback === undefined) {
         callback = function () { };
     }
-    let $image = $layerItem.find('.psd-layer-image-data');
-    let $loading = $layerItem.find('.psd-layer-image-data-loading');
+    let $image = $layerItem.find(PSDLayerImageDataSelector);
+    let $loading = $layerItem.find(PSDLayerImageDataLoadingSelector);
     if (loadingState) {
-        $layerItem.addClass('loading-image');
+        $layerItem.addClass(layerImageLoading);
         $image.fadeOut(TRANSITION_EFFECT_DURATION, function () {
             $loading.removeClass('d-none').hide();
             $loading.fadeIn(TRANSITION_EFFECT_DURATION, callback);
         });
     } else {
-        $layerItem.removeClass('loading-image');
+        $layerItem.removeClass(layerImageLoading);
         $loading.fadeOut(TRANSITION_EFFECT_DURATION, function () {
             $image.fadeIn(TRANSITION_EFFECT_DURATION, callback);
         });
@@ -120,7 +120,7 @@ function loadingLayerImage($layerItem, loadingState, callback) {
 }
 
 function setLayerImageSrc($layerItem, src) {
-    $layerItem.find('.psd-layer-image-data').attr('src', src);
+    $layerItem.find(PSDLayerImageDataSelector).attr('src', src);
 }
 
 function loadingGeneratePDF(loadingState, percent, callback) {
@@ -135,8 +135,8 @@ function loadingGeneratePDF(loadingState, percent, callback) {
         let percentString = percent + '%';
         $buttonGeneratePDFLoading.css('width', percentString);
         $buttonGeneratePDFLoading.text(percentString);
-        if (!$buttonGeneratePDFLoadingContainer.hasClass('loading')) {
-            $buttonGeneratePDFLoadingContainer.addClass('loading');
+        if (!$buttonGeneratePDFLoadingContainer.hasClass(loadingClass)) {
+            $buttonGeneratePDFLoadingContainer.addClass(loadingClass);
             $buttonGeneratePDF.fadeOut(TRANSITION_EFFECT_DURATION, function () {
                 $buttonGeneratePDFLoadingContainer.removeClass('d-none').hide();
                 $buttonGeneratePDFLoadingContainer.fadeIn(TRANSITION_EFFECT_DURATION, callback);
@@ -153,8 +153,8 @@ function loadingGeneratePDF(loadingState, percent, callback) {
             );
         }
     } else {
-        if ($buttonGeneratePDFLoadingContainer.hasClass('loading')) {
-            $buttonGeneratePDFLoadingContainer.removeClass('loading');
+        if ($buttonGeneratePDFLoadingContainer.hasClass(loadingClass)) {
+            $buttonGeneratePDFLoadingContainer.removeClass(loadingClass);
             $buttonGeneratePDFLoadingContainer.fadeOut(TRANSITION_EFFECT_DURATION, function () {
                 $buttonGeneratePDF.fadeIn(TRANSITION_EFFECT_DURATION, callback);
                 $buttonGeneratePDFLoadingContainer.addClass('d-none');
@@ -194,30 +194,30 @@ function setListPSDLayers(layers) {
                     + 'Escolha uma imagem para ser a padrão'
                     + '</label>'
                     + '</div></div>');
-                $imageInputGroup.appendTo($item.find('.list-psd-layer-input'));
+                $imageInputGroup.appendTo($item.find(listPSDLayerInputSelector));
             } else if (layer['type'] == 'type') {
                 let $textInput = $('<input type="text" class="form-control" id="psd-layer-' + id + '-value" '
                     + 'placeholder="Valor padrão do campo">');
-                $textInput.appendTo($item.find('.list-psd-layer-input'));
+                $textInput.appendTo($item.find(listPSDLayerInputSelector));
             }
             htmlContent += $item.prop('outerHTML');
         }
         $noLayersYet.fadeOut(TRANSITION_EFFECT_DURATION, function () {
             $listPSDLayers.html(htmlContent);
             bsCustomFileInput.init();
-            $('.psd-layer-list-item').click(function () {
+            $(PSDLayerListItemSelector).click(function () {
                 $(this).toggleClass('active');
             });
-            $('.psd-layer-list-item input').click(function(event) {
+            $(PSDLayerListItemSelector + ' input').click(function(event) {
                 event.stopPropagation();
             });
-            $('.psd-layer-pixel-input-file').change(function() {
-                let $layerItem = $(this).parents('.psd-layer-list-item');
+            $(PSDLayerPixelInputFileSelector).change(function() {
+                let $layerItem = $(this).parents(PSDLayerListItemSelector);
                 let reader = new FileReader();
                 reader.onload = function () {
                     loadingLayerImage($layerItem, false)
                     setLayerImageSrc($layerItem, reader.result);
-                    $layerItem.addClass('image-loaded');
+                    $layerItem.addClass(layerImageLoaded);
                 }
                 let fileURL = $(this).prop('files')[0];
                 if (fileURL) {
@@ -232,6 +232,7 @@ function setListPSDLayers(layers) {
     } else {
         $listPSDLayers.fadeOut(TRANSITION_EFFECT_DURATION, function() {
             $listPSDLayers.html('');
+            $listPSDLayers.fadeIn();
             $noLayersYet.fadeIn();
         });
     }
@@ -263,15 +264,15 @@ function excelTextToObject(text) {
 function getClientInputLayers() {
     let inputs = {};
     $listPSDLayers.children('.active').each(function() {
-        let id = parseInt($(this).data('layer-id'));
-        let tagSelector = '#psd-layer-' + id + '-tag';
+        let id = parseInt($(this).data(layerIDAttr));
+        let tagSelector = PSDLayerIDSelector + id + '-tag';
         let tag = $(this).find(tagSelector).val();
-        let defaultValueSelector = '#psd-layer-' + id + '-value';
+        let defaultValueSelector = PSDLayerIDSelector + id + '-value';
         let $defaultValue = $(this).find(defaultValueSelector);
         let defaultValueType = $defaultValue.attr('type');
         let defaultValue = null;
         if (defaultValueType == 'file') {
-            defaultValue = $(this).find('.psd-layer-image-data').attr('src');
+            defaultValue = $(this).find(PSDLayerImageDataSelector).attr('src');
         } else {
             defaultValue = $defaultValue.val();
         }
@@ -306,7 +307,7 @@ function validateToGeneratePDF() {
     }
 
     //All pixel fields must be loaded if chosen a image as default
-    if ($listPSDLayers.children('.loading-image').length > 0) {
+    if ($listPSDLayers.children('.' + layerImageLoading).length > 0) {
         alertBox('Ainda há imagens carregando. Aguarde o carregamento antes proceder.', ALERT_DANGER);
         return false;
     }
@@ -369,10 +370,7 @@ function setPDFLinkButton(loadedState, pdf_link) {
             $PDFFileLink.addClass('d-none');
             $buttonGeneratePDFLoadingContainer.fadeOut(TRANSITION_EFFECT_DURATION, function() {
                 $buttonGeneratePDFLoadingContainer.addClass('d-none');
-                $buttonGeneratePDF.fadeIn(TRANSITION_EFFECT_DURATION);
-                if ($buttonGeneratePDFLoading[0].loadingInterval) {
-                    clearInterval($buttonGeneratePDFLoading[0].loadingInterval);
-                }
+                loadingGeneratePDF(false);
             });
         });
     }

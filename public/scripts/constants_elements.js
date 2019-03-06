@@ -8,36 +8,77 @@ const ALERT_SUCCESS = 'success';
 const ALERT_WARNING = 'warning';
 const ALERT_DANGER = 'danger';
 
+//Attributes
+let layerIDAttr = 'layer-id';
+
+//Element Selectors
+let bodyContentSelector = '#body-content';
+let uploadContentSelector = '#upload-container';
+let inputPSDContainerSelector = '#input-psd-container';
+let inputPSDSelector = '#input-psd';
+let inputPSDLoadingSelector = '#loading-input-psd';
+let PSDImageContainerSelector = '#psd-image-container';
+let PSDImageSelector = '#psd-image';
+
+let formPSDTemplaterSelector = '#form-psd-templater';
+let PDFSizePresetSelector = '#pdf-size-preset';
+let PDFSizeWidthSelector = '#pdf-size-width';
+let PDFSizeHeightSelector = '#pdf-size-height';
+
+let listPSDLayersSelector = '#list-psd-layers';
+let noLayersYetSelector = '#no-layers-yet';
+let PSDLayerImageDataSelector = '.psd-layer-image-data';
+let PSDLayerImageDataLoadingSelector = '.psd-layer-image-data-loading';
+let PSDLayerListItemSelector = '.psd-layer-list-item';
+let PSDLayerPixelInputFileSelector = '.psd-layer-pixel-input-file';
+let PSDLayerIDSelector = '#psd-layer-';
+let listPSDLayerInputSelector = '.list-psd-layer-input';
+
+//Help Classes
+let loadingClass = 'loading';
+let layerImageLoading = 'loading-image';
+let layerImageLoaded = 'image-loaded';
+
+
+let templateContentValuesSelector = '#template-content-values';
+
+let buttonGeneratePDF = '#btn-generate-pdf';
+let buttonGeneratePDFLoadingContainerSelector = '#loading-generate-psd-container';
+let buttonGeneratePDFLoadingSelector = '#loading-generate-psd';
+let PDFFileLinkSelector = '#pdf-file-link';
+
+let resetApllicationSelector = '#reset-application';
+
 //DOM Elements
 
 //Input PSD Container
-let $bodyContent = $('#body-content');
-let $uploadContent = $('#upload-container');
-let $inputPSDContainer = $('#input-psd-container');
-let $inputPSD = $('#input-psd');
-let $inputPSDLoading = $('#loading-input-psd');
-let $PSDImageContainer = $('#psd-image-container');
-let $PSDImage = $('#psd-image');
+let $bodyContent = $(bodyContentSelector);
+let $uploadContent = $(uploadContentSelector);
+let $inputPSDContainer = $(inputPSDContainerSelector);
+let $inputPSD = $(inputPSDSelector);
+let $inputPSDLoading = $(inputPSDLoadingSelector);
+let $PSDImageContainer = $(PSDImageContainerSelector);
+let $PSDImage = $(PSDImageSelector);
 
 //Form
-let $formPSDTemplater = $('#form-psd-templater');
-let $PDFSizePreset = $('#pdf-size-preset');
-let $PDFSizeWidth = $('#pdf-size-width');
-let $PDFSizeHeight = $('#pdf-size-height');
+let $formPSDTemplater = $(formPSDTemplaterSelector);
+let $PDFSizePreset = $(PDFSizePresetSelector);
+let $PDFSizeWidth = $(PDFSizeWidthSelector);
+let $PDFSizeHeight = $(PDFSizeHeightSelector);
 
 //Layers
-let $listPSDLayers = $('#list-psd-layers');
-let $noLayersYet = $('#no-layers-yet');
+let $listPSDLayers = $(listPSDLayersSelector);
+let $noLayersYet = $(noLayersYetSelector);
 
 //Content Values
-let $templateContentValues = $('#template-content-values');
+let $templateContentValues = $(templateContentValuesSelector);
 
 //Generate PDF
-let $buttonGeneratePDF = $('#btn-generate-pdf');
-let $buttonGeneratePDFLoadingContainer = $('#loading-generate-psd-container');
-let $buttonGeneratePDFLoading = $('#loading-generate-psd');
-let $PDFFileLink = $('#pdf-file-link');
+let $buttonGeneratePDF = $(buttonGeneratePDF);
+let $buttonGeneratePDFLoadingContainer = $(buttonGeneratePDFLoadingContainerSelector);
+let $buttonGeneratePDFLoading = $(buttonGeneratePDFLoadingSelector);
+let $PDFFileLink = $(PDFFileLinkSelector);
 
 
 //Button to reset application
-let $resetApllication = $('#reset-application');
+let $resetApllication = $(resetApllicationSelector);
