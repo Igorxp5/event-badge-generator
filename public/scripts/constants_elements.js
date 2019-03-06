@@ -1,6 +1,7 @@
 //Constants
 const TRANSITION_EFFECT_DURATION = 400;
 const ALERT_DEFAULT_TIMEOUT = 5000;
+const INTERVAL_LOADING_GENERATE_PDF = 400;
 
 const ALERT_PRIMARY = 'primary';
 const ALERT_SUCCESS = 'success';
