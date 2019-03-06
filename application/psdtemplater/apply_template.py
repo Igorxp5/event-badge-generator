@@ -4,9 +4,10 @@ from io import BytesIO
 from pathlib import Path
 from psd_tools import PSDImage
 from PIL import Image, ImageFont
+from urllib.request import urlopen
 
 from .constants import *
-from .util import get_psd_or_raise
+from .util import get_psd_or_raise, is_url
 from .view_psd_layers import get_all_psd_layers
 from .create_template import get_text_layer_properties
 from .exceptions import FontNotFoundError, FieldNotFilledError
@@ -56,7 +57,11 @@ def apply_template(template, content_values, resize_pixel_layers=True):
             layer_images.append((field, layer, layer_image))
         elif PSDLayer(layer.kind) is PSDLayer.PIXEL:
             layer_image = None
-            if re.search(BASE64_IMAGE_PATTERN, input_value):
+            if is_url(input_value):
+                request_url = urlopen(input_value)
+                image_stream = BytesIO(request_url.read())
+                layer_image = Image.open(image_stream)
+            elif re.search(BASE64_IMAGE_PATTERN, input_value):
                 image_data = re.sub('^data:image/.+;base64,', '', input_value)
                 layer_image = Image.open(BytesIO(base64.b64decode(image_data)))
             else:

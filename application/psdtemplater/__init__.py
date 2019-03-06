@@ -25,7 +25,7 @@ from .apply_template import apply_template, TextLayerAlignment,\
     CharSequenceCase, FontStyle
 
 # Utils
-from .util import get_psd_or_raise
+from .util import get_psd_or_raise, is_url
 
 # Exceptions
 from .exceptions import FileError, FontNotFoundError, FieldNotFilledError,\
