@@ -76,7 +76,7 @@ def handle_send_psd(psd_data):
             'psd_fonts': psd_fonts,
             'unavailable_psd_fonts': unavailable,
             'default_font': font_utils.filter_font_name(
-                psdtemplater.DEFAULT_RENDER_FONT
+                psdtemplater.DEFAULT_FONT_NAME
             )
         })
 
