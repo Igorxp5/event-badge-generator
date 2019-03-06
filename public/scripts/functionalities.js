@@ -2,6 +2,11 @@
 class InvalidQuantityColsError extends Error {}
 class MissingColsError extends Error {}
 
+
+/**
+ * Check the connection to the server and if it does not, it shows an alert on the screen.
+ * @return {boolean} If it's connected or not.
+ */
 function checkConnection() {
     let connected = socket.connected;
     if (!connected) {
@@ -10,6 +15,14 @@ function checkConnection() {
     return connected;
 }
 
+/**
+ * Show an alert box on the screen.
+ * @param  {string} text Text to be displayed.
+ * @param {string} type Alert Category ['primary', danger ',' warning ',' success'].
+ * @param {int} timeout Alert duration time. In case 0 the alert will be
+ * undetermined time. Standard: 5000.
+ * @return {jQuerySelector} Alert element.
+ */
 function alertBox(text, type, timeout) {
     if (timeout === undefined) {
         timeout = ALERT_DEFAULT_TIMEOUT;
@@ -36,6 +49,10 @@ function alertBox(text, type, timeout) {
     return $alert;
 }
 
+/**
+ * Set the width and height field values based on
+ * the value of the preset field.
+ */
 function setPDFSizeByPreset() {
     let value = $PDFSizePreset.val();
     if (value) {
@@ -45,6 +62,10 @@ function setPDFSizeByPreset() {
     }
 }
 
+/**
+ * Set the preset field based on the values written
+ * in the fields width and height.
+ */
 function setPresetByPSDSizeInput() {
     let width = $PDFSizeWidth.val();
     let height = $PDFSizeHeight.val();
@@ -61,6 +82,13 @@ function setPresetByPSDSizeInput() {
     $PDFSizePreset.prop('options')[customIndex].selected = true;
 }
 
+/**
+ * Switch between the Upload Template button and the upload animation.
+ * @param {boolean} loadingState True to apply the upload and False to return
+ * to the Upload Template button.
+ * @param {function} callback Function that will be called
+ * when the animation is finished.
+ */
 function loadingInputPSD(loadingState, callback) {
     if (callback === undefined) {
         callback = function() {};
@@ -77,6 +105,12 @@ function loadingInputPSD(loadingState, callback) {
     }
 }
 
+/**
+ * Switch between PSD loading and image display.
+ * @param {string base64} image_data Imagem do PSD.
+ * @param {function} callback Function that will be called
+ * when the animation is finished.
+ */
 function setPSDImage(image_data, callback) {
     if (!callback) {
         callback = function() {};
@@ -99,6 +133,14 @@ function setPSDImage(image_data, callback) {
     }
 }
 
+/**
+ * Toggle between loading the layer preview image.
+ * @param {jQuerySelector} $layerItem Element layer item.
+ * @param {boolean} loadingState True to show loading animation.
+ * False to show the image again.
+ * @param {function} callback Function that will be called
+ * when the animation is finished.
+ */
 function loadingLayerImage($layerItem, loadingState, callback) {
     if (callback === undefined) {
         callback = function () { };
@@ -119,10 +161,23 @@ function loadingLayerImage($layerItem, loadingState, callback) {
     }
 }
 
+/**
+ * Set the preview image of the layer.
+ * @param {jQuerySelector} $layerItem Element layer item.
+ * @param {string} src URL of the image.
+ */
 function setLayerImageSrc($layerItem, src) {
     $layerItem.find(PSDLayerImageDataSelector).attr('src', src);
 }
 
+/**
+ * Toggle between loading PDF and Generate PDF button.
+ * @param {boolean} loadingState True to show loading.
+ * False to show the Generate PDF button again.
+ * @param {number} percent Percentage of loading.
+ * @param {function} callback Function that will be called
+ * when the animation is finished.
+ */
 function loadingGeneratePDF(loadingState, percent, callback) {
     if (!callback) {
         callback = function() {};
@@ -166,6 +221,10 @@ function loadingGeneratePDF(loadingState, percent, callback) {
     }
 }
 
+/**
+ * Put the PSD layers on screen.
+ * @param {array} layers Layers.
+ */
 function setListPSDLayers(layers) {
     if (layers) {
         let htmlContent = '';
@@ -239,6 +298,12 @@ function setListPSDLayers(layers) {
 
 }
 
+/**
+ * Convert text from Excel into a list of objects,
+ * each containing the column as the key and the value of the row.
+ * @param {string} text Excel text.
+ * @return {}
+ */
 function excelTextToObject(text) {
     let result = [];
     let rows = text.split('\n');
@@ -261,6 +326,9 @@ function excelTextToObject(text) {
     return result;
 }
 
+/**
+ * Returns to the input layers formatted from the choices made.
+ */
 function getClientInputLayers() {
     let inputs = {};
     $listPSDLayers.children('.active').each(function() {
@@ -286,6 +354,10 @@ function getClientInputLayers() {
     return inputs;
 }
 
+/**
+ * Perform validation of all form fields,
+ * if something is invalid an error message is issued as an alert.
+ */
 function validateToGeneratePDF() {
     //A PSD file must be chosen
     if (!$PSDImage.attr('src')) {
@@ -357,6 +429,12 @@ function validateToGeneratePDF() {
     return true;
 }
 
+/**
+ * Toggle between link to PDF and loading of PDF / Generate PDF button.
+ * @param {boolean} loadedState True to hide loading and show the button link.
+ * False to show the Generate PDF button again.
+ * @param {string} pdf_link Link to PDF file.
+ */
 function setPDFLinkButton(loadedState, pdf_link) {
     if (loadedState) {
         $buttonGeneratePDFLoadingContainer.fadeOut(TRANSITION_EFFECT_DURATION, function(){
@@ -376,12 +454,20 @@ function setPDFLinkButton(loadedState, pdf_link) {
     }
 }
 
+/**
+ * Return the size of the PDF chosen by the user.
+ * @return {array} [Width, Height]
+ */
 function getPDFSize() {
     let width = parseInt($PDFSizeWidth.val());
     let height = parseInt($PDFSizeHeight.val());
     return [width, height];
 }
 
+/**
+ * Get the values of the Input Layers and the data of the
+ * Import Participants field, in an understandable format for the server.
+ */
 function getInputLayersAndData() {
     let result = {};
     let clientInputLayers = getClientInputLayers();
@@ -415,6 +501,10 @@ function getInputLayersAndData() {
     return result;
 }
 
+/**
+ * Generates the PDF from the images generated by the server.
+ * @param {array} images Array of images in base64.
+ */
 function generatePDFFromImages(images) {
     let size = getPDFSize();
     let pdf = new jsPDF();
@@ -431,6 +521,9 @@ function generatePDFFromImages(images) {
     return pdf.output('bloburl');
 }
 
+/**
+ * Completely reset the application.
+ */
 function resetApplication() {
     $('.alert').fadeOut(function() {
         $(this).remove();
