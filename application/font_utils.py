@@ -33,6 +33,7 @@ def get_os_font_dirs():
 def get_system_ttf_font_files():
     """Return list with all system ttf fonts."""
     fonts_dir = get_os_font_dirs()
+    fonts_dir = [d for d in fonts_dir if d.exists()]
     return [f for d in fonts_dir for f in os.listdir(d) if f.endswith('.ttf')]
 
 
