@@ -202,6 +202,9 @@ function loadingGeneratePDF(loadingState, percent, callback) {
                 $buttonGeneratePDFLoading[0].percentInt = parseInt($buttonGeneratePDFLoading[0].percent);
                 $buttonGeneratePDFLoading.css('width', $buttonGeneratePDFLoading[0].percentString);
                 $buttonGeneratePDFLoading.text($buttonGeneratePDFLoading[0].percentInt + '%');
+                if ($buttonGeneratePDFLoading[0].percent > 100) {
+                    clearInterval($buttonGeneratePDFLoading[0].loadingInterval);
+                }
             }
             $buttonGeneratePDFLoading[0].loadingInterval = setInterval(
                 $buttonGeneratePDFLoading[0].loadingFunction, INTERVAL_LOADING_GENERATE_PDF
