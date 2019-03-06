@@ -10,7 +10,7 @@ __version__ = '0.0.0'
 
 # Constants
 from .constants import AVAILABLE_OUTPUT_FILE_EXTENSIONS,\
-    DEFAULT_OUTPUT_FILE_EXTENSION
+    DEFAULT_OUTPUT_FILE_EXTENSION, DEFAULT_RENDER_FONT
 
 # Classes
 from .classes import PSDLayer,\
