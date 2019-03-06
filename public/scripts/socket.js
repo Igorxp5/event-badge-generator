@@ -26,10 +26,12 @@ socket.on('converting_images_progress', function(data) {
 });
 
 socket.on('converted_images', function(data) {
-    let urlBlob = generatePDFFromImages(data['images']);
-    loadingGeneratePDF(true, 100);
-    setPDFLinkButton(true, urlBlob);
-    window.open(urlBlob);
+    setTimeout(function() {
+        let urlBlob = generatePDFFromImages(data['images']);
+        loadingGeneratePDF(true, 100);
+        setPDFLinkButton(true, urlBlob);
+        window.open(urlBlob);
+    }, 500);
 });
 
 socket.on('error', function (data) {
