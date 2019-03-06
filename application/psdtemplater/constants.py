@@ -27,3 +27,6 @@ TEMPLATE_REPLACE_PATTERN = r'\{\{([^\{\}]*)\}\}'
 
 # Base64 Pattern
 BASE64_IMAGE_PATTERN = '^data:image/.+;base64,'
+
+# DEFAULT FONT
+DEFAULT_RENDER_FONT = 'arial'

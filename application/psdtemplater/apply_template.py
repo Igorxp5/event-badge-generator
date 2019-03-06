@@ -106,7 +106,8 @@ def __get_field_value(field, content_values):
     return value
 
 
-def __get_image_type_field(color_mode, fonts, field, layer, text):
+def __get_image_type_field(color_mode, fonts, field,
+                           layer, text, default_font=DEFAULT_RENDER_FONT):
     text_properties = get_text_layer_properties(layer)
     font_name, font_size, fill_color = text_properties
     font = None
@@ -118,14 +119,25 @@ def __get_image_type_field(color_mode, fonts, field, layer, text):
     except OSError:
         font = None
 
-    if font is None:
+    if not font:
         try:
             font = fonts.get(
                 text_properties[0],
                 ImageFont.truetype(font_name + '.otf', round(font_size))
             )
         except OSError:
-            raise FontNotFoundError(font_name)
+            if not default_font:
+                raise FontNotFoundError(font_name)
+    if not font:
+        try:
+            font = fonts.get(
+                text_properties[0],
+                ImageFont.truetype(default_font + '.ttf', round(font_size))
+            )
+        except OSError:
+            raise FontNotFoundError(default_font)
+
+
     fonts[text_properties[0]] = font
     return render_text(color_mode, text, font, fill_color)
 
