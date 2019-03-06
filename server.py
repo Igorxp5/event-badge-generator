@@ -66,19 +66,22 @@ def handle_send_psd(psd_data):
 
     if len(available_psd_fonts) != len(psd_fonts):
         unavailable = [f for f in psd_fonts if f not in available_psd_fonts]
+        unavailable = [font_utils.filter_font_name(f) for f in unavailable]
         io.emit('unavailable_fonts', {
             'psd_fonts': psd_fonts,
-            'available_psd_fonts': available_psd_fonts,
-            'unavailable_psd_fonts': unavailable
+            'unavailable_psd_fonts': unavailable,
+            'default_font': font_utils.filter_font_name(
+                psdtemplater.DEFAULT_RENDER_FONT
+            )
         })
-    else:
-        editable_psd_layers = psd_utils.get_editable_psd_layers(psd_file_path)
-        psd_image = psdtemplater.render_psd(psd_file_path)
-        psd_image_data = utils.get_base64_from_pil_image(psd_image)
-        io.emit('psd_layers', {
-            'editable_psd_layers': editable_psd_layers,
-            'psd_image_data': psd_image_data
-        })
+
+    editable_psd_layers = psd_utils.get_editable_psd_layers(psd_file_path)
+    psd_image = psdtemplater.render_psd(psd_file_path)
+    psd_image_data = utils.get_base64_from_pil_image(psd_image)
+    io.emit('psd_layers', {
+        'editable_psd_layers': editable_psd_layers,
+        'psd_image_data': psd_image_data
+    })
 
 
 @io.on('send_input_layers_data')

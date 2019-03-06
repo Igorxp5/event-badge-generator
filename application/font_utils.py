@@ -43,8 +43,14 @@ def get_system_ttf_dict():
     fonts = {}
     ttf_fonts = get_system_ttf_font_files()
     for ttf in ttf_fonts:
-        font_name = re.sub('.ttf|Demo|demo|trial', '', ttf)
-        font_name = font_name.replace('-', ' ').strip()
-        font_name = font_name[0].upper() + font_name[1:]
+        font_name = filter_font_name(ttf)
         fonts[font_name] = ttf
     return fonts
+
+
+def filter_font_name(font_name):
+    """Returns the font name in a more presentable way."""
+    font_name = re.sub('.ttf|Demo|demo|trial', '', font_name)
+    font_name = font_name.replace('-', ' ').strip()
+    font_name = font_name[0].upper() + font_name[1:]
+    return font_name

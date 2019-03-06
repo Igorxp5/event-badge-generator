@@ -5,7 +5,13 @@ socket.on('connect', function () {
 });
 
 socket.on('unavailable_fonts', function(data) {
-    console.log(data);
+    unavailableFonts = data['unavailable_psd_fonts'];
+    unavailableFontsText = unavailableFonts.join(', ');
+    defaultFont = data['default_font'];
+    alertBox('As fontes <strong>' + unavailableFontsText + '</strong> '
+        + 'não estão disponíveis para rederização. Elas foram '
+        + 'substituídas pela <strong>' + defaultFont + '</strong>.',
+        ALERT_WARNING, 0);
 });
 
 socket.on('psd_layers', function (data) {
@@ -24,7 +30,4 @@ socket.on('converted_images', function(data) {
     loadingGeneratePDF(true, 100);
     setPDFLinkButton(true, urlBlob);
     window.open(urlBlob);
-
-    //let url = data['url'];
-    //setPDFLinkButton(true, url);
 });
