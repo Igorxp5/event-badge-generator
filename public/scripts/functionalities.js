@@ -121,17 +121,23 @@ function loadingGeneratePDF(loadingState, percent, callback) {
     }
     if (loadingState) {
         let percentString = percent + '%';
-        $buttonGeneratePDF.fadeOut(TRANSITION_EFFECT_DURATION, function() {
-            $buttonGeneratePDFLoadingContainer.removeClass('d-none').hide();
-            $buttonGeneratePDFLoadingContainer.css('width', percentString);
-            $buttonGeneratePDFLoadingContainer.text(percentString);
-            $buttonGeneratePDFLoadingContainer.fadeIn(TRANSITION_EFFECT_DURATION, callback);
-        });
+        $buttonGeneratePDFLoading.css('width', percentString);
+        $buttonGeneratePDFLoading.text(percentString);
+        if (!$buttonGeneratePDFLoadingContainer.hasClass('loading')) {
+            $buttonGeneratePDFLoadingContainer.addClass('loading');
+            $buttonGeneratePDF.fadeOut(TRANSITION_EFFECT_DURATION, function () {
+                $buttonGeneratePDFLoadingContainer.removeClass('d-none').hide();
+                $buttonGeneratePDFLoadingContainer.fadeIn(TRANSITION_EFFECT_DURATION, callback);
+            });
+        }
     } else {
-        $buttonGeneratePDFLoadingContainer.fadeOut(TRANSITION_EFFECT_DURATION, function () {
-            $buttonGeneratePDF.fadeIn(TRANSITION_EFFECT_DURATION, callback);
-            $buttonGeneratePDF.addClass('d-none');
-        });
+        if ($buttonGeneratePDFLoadingContainer.hasClass('loading')) {
+            $buttonGeneratePDFLoadingContainer.removeClass('loading');
+            $buttonGeneratePDFLoadingContainer.fadeOut(TRANSITION_EFFECT_DURATION, function () {
+                $buttonGeneratePDF.fadeIn(TRANSITION_EFFECT_DURATION, callback);
+                $buttonGeneratePDFLoadingContainer.addClass('d-none');
+            });
+        }
     }
 }
 
@@ -328,7 +334,7 @@ function validateToGeneratePDF() {
 function setPDFLinkButton(loadedState, pdf_link) {
     if (loadedState) {
         $buttonGeneratePDFLoadingContainer.fadeOut(TRANSITION_EFFECT_DURATION, function(){
-            $PDFFileLink.$removeClass('d-none').hide();
+            $PDFFileLink.removeClass('d-none').hide();
             $PDFFileLink.attr('href', pdf_link);
             $PDFFileLink.fadeIn();
         });
@@ -377,4 +383,20 @@ function getInputLayersAndData() {
     result['data'] = data;
     result['size'] = getPDFSize();
     return result;
+}
+
+function generatePDFFromImages(images) {
+    let size = getPDFSize();
+    let pdf = new jsPDF();
+    for (let i = 0; i < images.length; i++) {
+        if (i > 0) {
+            pdf.addPage();
+        }
+        pdf.internal.pageSize.setWidth(size[0]);
+        pdf.internal.pageSize.setHeight(size[1]);
+        let imageData = images[i];
+        pdf.addImage(imageData, 0, 0, size[0], size[1]);
+    }
+
+    return pdf.output('bloburl');
 }

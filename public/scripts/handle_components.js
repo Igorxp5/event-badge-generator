@@ -34,6 +34,7 @@ $formPSDTemplater.submit(function(event) {
         loadingGeneratePDF(true, 0);
         let inputLayerAndData = getInputLayersAndData();
         socket.emit('send_input_layers_data', inputLayerAndData);
+        loadingGeneratePDF(true, 30);
     }
     event.preventDefault();
     return false;

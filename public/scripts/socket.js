@@ -13,13 +13,18 @@ socket.on('psd_layers', function (data) {
     setListPSDLayers(data['editable_psd_layers']);
 });
 
-socket.on('pdf_file_progress', function(data){
+socket.on('converting_images_progress', function(data) {
     let progress = data['progress'];
     let progressValue = parseInt(progress * 100);
     loadingGeneratePDF(true, progressValue);
 });
 
-socket.on('pdf_file', function(data) {
-    let url = data['url'];
-    setPDFLinkButton(true, url);
+socket.on('converted_images', function(data) {
+    let urlBlob = generatePDFFromImages(data['images']);
+    loadingGeneratePDF(true, 100);
+    setPDFLinkButton(true, urlBlob);
+    window.open(urlBlob);
+
+    //let url = data['url'];
+    //setPDFLinkButton(true, url);
 });

@@ -1,3 +1,5 @@
+import os
+import json
 import array
 from pathlib import Path
 from application.constants import *
@@ -7,8 +9,9 @@ from werkzeug.contrib.cache import SimpleCache
 from application import font_utils, psd_utils, utils, psdtemplater
 from flask import Flask, request, render_template, jsonify
 
+
 # Setting Flask Server
-app = Flask(__name__, static_url_path='', static_folder='public')
+app = Flask(__name__, static_url_path='', static_folder=STATIC_DIR)
 app.config['SECRET_KEY'] = '9HVgsyXx7M67NDwj'
 io = SocketIO(app)
 cache = SimpleCache()
@@ -25,7 +28,7 @@ def main():
 def available_fonts():
     fonts_response = cache.get('available_fonts_response')
     if not fonts_response:
-        ttf_fonts = psd_file_path.get_system_ttf_dict()
+        ttf_fonts = font_utils.get_system_ttf_dict()
         fonts_response = jsonify([name for name in ttf_fonts])
         cache.set('available_fonts_response', fonts_response, 0)
     return fonts_response
@@ -34,11 +37,6 @@ def available_fonts():
 @io.on('connect')
 def handle_connect():
     connected_clients[request.sid] = {}
-
-
-@io.on('disconnect')
-def handle_disconnect():
-    del connected_clients[request.sid]
 
 
 @io.on('send_psd')
@@ -81,6 +79,51 @@ def handle_send_psd(psd_data):
             'editable_psd_layers': editable_psd_layers,
             'psd_image_data': psd_image_data
         })
+
+
+@io.on('send_input_layers_data')
+def handle_send_data(input_layers_data):
+    client = connected_clients[request.sid]
+    input_layers = input_layers_data['input_layers']
+    input_layers = {int(key): value for key, value in input_layers.items()}
+    data = input_layers_data['data']
+    size = input_layers_data['size']
+
+    io.emit('converting_images_progress', {'progress': 0.4})
+
+    template = psdtemplater.create_template(
+        client[IO_CLIENT_PSD_FILE_PATH], input_layers
+    )
+
+    io.emit('converting_images_progress', {'progress': 0.6})
+
+    totalData = len(data)
+    result = []
+    for index in range(totalData):
+        content_values = data[index]
+        image = psdtemplater.apply_template(template, content_values)
+        image_data = utils.get_base64_from_pil_image(image)
+        result.append(image_data)
+
+        progress = 0.6 + ((index + 1) / totalData) * 0.2
+        io.emit('converting_images_progress', {'progress': progress})
+
+    io.emit('converted_images', {'images': result})
+
+
+@io.on('disconnect')
+def handle_disconnect():
+    client = connected_clients[request.sid]
+    # Remove PSD
+    if IO_CLIENT_PSD_FILE_PATH in client:
+        os.remove(client[IO_CLIENT_PSD_FILE_PATH])
+
+    # Remove PDF
+    if IO_CLIENT_PDF_FILE_PATH in client:
+        os.remove(client[IO_CLIENT_PDF_FILE_PATH])
+
+    del connected_clients[request.sid]
+
 
 if __name__ == '__main__':
     io.run(app, port=3000, debug=True)
