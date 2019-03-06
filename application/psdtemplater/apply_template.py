@@ -106,8 +106,7 @@ def __get_field_value(field, content_values):
     return value
 
 
-def __get_image_type_field(color_mode, fonts, field,
-                           layer, text, default_font=DEFAULT_RENDER_FONT):
+def __get_image_type_field(color_mode, fonts, field, layer, text):
     text_properties = get_text_layer_properties(layer)
     font_name, font_size, fill_color = text_properties
     font = None
@@ -126,20 +125,27 @@ def __get_image_type_field(color_mode, fonts, field,
                 ImageFont.truetype(font_name + '.otf', round(font_size))
             )
         except OSError:
-            if not default_font:
-                raise FontNotFoundError(font_name)
-    if not font:
-        try:
             font = fonts.get(
                 text_properties[0],
-                ImageFont.truetype(default_font + '.ttf', round(font_size))
+                __get_lib_default_font(layer, font_size)
             )
-        except OSError:
-            raise FontNotFoundError(default_font)
-
 
     fonts[text_properties[0]] = font
     return render_text(color_mode, text, font, fill_color)
+
+
+def __get_lib_default_font(text_layer, font_size):
+    font_styles = FontStyle.get_font_styles(text_layer)
+    font_name = None
+    if FontStyle.BOLD and FontStyle.ITALIC in font_styles:
+        font_name = DEFAULT_FONT_REGULAR_BOLD_ITALIC
+    elif FontStyle.BOLD in font_styles:
+        font_name = DEFAULT_FONT_REGULAR_BOLD
+    elif FontStyle.ITALIC in font_styles:
+        font_name = DEFAULT_FONT_REGULAR_ITALIC
+    else:
+        font_name = DEFAULT_FONT_REGULAR
+    return ImageFont.truetype(font_name + '.ttf', round(font_size))
 
 
 def __apply_text_layer_filter(text_layer, text):

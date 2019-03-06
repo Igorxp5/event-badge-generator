@@ -29,4 +29,8 @@ TEMPLATE_REPLACE_PATTERN = r'\{\{([^\{\}]*)\}\}'
 BASE64_IMAGE_PATTERN = '^data:image/.+;base64,'
 
 # DEFAULT FONT
-DEFAULT_RENDER_FONT = 'arial'
+DEFAULT_FONT_NAME = 'Roboto'
+DEFAULT_FONT_REGULAR = 'fonts/Roboto-Regular'
+DEFAULT_FONT_REGULAR_BOLD = 'fonts/Roboto-Bold'
+DEFAULT_FONT_REGULAR_ITALIC = 'fonts/Roboto-Italic'
+DEFAULT_FONT_REGULAR_BOLD_ITALIC = 'fonts/Roboto-BoldItalic'
