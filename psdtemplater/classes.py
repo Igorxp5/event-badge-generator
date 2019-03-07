@@ -5,9 +5,12 @@ from enum import Enum
 class PSDLayer(str, Enum):
     """Possible PSD Layer types."""
 
-    GROUP = 'group'
     TYPE = 'type'
     PIXEL = 'pixel'
+    SHAPE = 'shape'
+    GROUP = 'group'
+    PSD_IMAGE = 'psdimage'
+    SMART_OBJECT = 'smartobject'
 
 
 class TextLayerAlignment(int, Enum):
