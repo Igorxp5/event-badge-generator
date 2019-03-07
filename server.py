@@ -57,9 +57,15 @@ def available_fonts():
 
 @io.on('connect')
 def handle_connect():
-    connected_clients[request.sid] = {}
+    if request.sid not in connected_clients:
+        connected_clients[request.sid] = {}
+
     client = connected_clients[request.sid]
     client[IO_CLIENT_CONNECTION_START_TIME] = datetime.now()
+
+    if IO_CLIENT_CONVERTED_IMAGES in client:
+        result = client[IO_CLIENT_CONVERTED_IMAGES]
+        io.emit('converted_images', {'images': result})
 
 
 @io.on('send_psd')
@@ -140,7 +146,9 @@ def handle_send_data(input_layers_data):
         print(f'Client \'{request.sid}\' Progress: {progress * 100}%')
         io.emit('converting_images_progress', {'progress': progress})
 
+    client[IO_CLIENT_CONVERTED_IMAGES] = result
     io.emit('converted_images', {'images': result})
+    print(f'Client \'{request.sid}\': Images created!')
 
 if __name__ == '__main__':
     time_loop.start()
