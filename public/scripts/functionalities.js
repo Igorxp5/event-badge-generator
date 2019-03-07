@@ -186,7 +186,6 @@ function loadingGeneratePDF(loadingState, percent, callback) {
         percent = 0;
     }
     if (loadingState) {
-        $buttonGeneratePDFLoading[0].percent = percent;
         let percentString = percent + '%';
         $buttonGeneratePDFLoading.css('width', percentString);
         $buttonGeneratePDFLoading.text(percentString);
@@ -196,19 +195,6 @@ function loadingGeneratePDF(loadingState, percent, callback) {
                 $buttonGeneratePDFLoadingContainer.removeClass('d-none').hide();
                 $buttonGeneratePDFLoadingContainer.fadeIn(TRANSITION_EFFECT_DURATION, callback);
             });
-            $buttonGeneratePDFLoading[0].loadingFunction = function() {
-                $buttonGeneratePDFLoading[0].percent += 0.1;
-                $buttonGeneratePDFLoading[0].percentString = $buttonGeneratePDFLoading[0].percent + '%';
-                $buttonGeneratePDFLoading[0].percentInt = parseInt($buttonGeneratePDFLoading[0].percent);
-                $buttonGeneratePDFLoading.css('width', $buttonGeneratePDFLoading[0].percentString);
-                $buttonGeneratePDFLoading.text($buttonGeneratePDFLoading[0].percentInt + '%');
-                if ($buttonGeneratePDFLoading[0].percent > 100) {
-                    clearInterval($buttonGeneratePDFLoading[0].loadingInterval);
-                }
-            }
-            $buttonGeneratePDFLoading[0].loadingInterval = setInterval(
-                $buttonGeneratePDFLoading[0].loadingFunction, INTERVAL_LOADING_GENERATE_PDF
-            );
         }
     } else {
         if ($buttonGeneratePDFLoadingContainer.hasClass(loadingClass)) {
@@ -217,9 +203,6 @@ function loadingGeneratePDF(loadingState, percent, callback) {
                 $buttonGeneratePDF.fadeIn(TRANSITION_EFFECT_DURATION, callback);
                 $buttonGeneratePDFLoadingContainer.addClass('d-none');
             });
-            if ($buttonGeneratePDFLoading[0].loadingInterval) {
-                clearInterval($buttonGeneratePDFLoading[0].loadingInterval);
-            }
         }
     }
 }
