@@ -55,7 +55,7 @@ def apply_template(template, content_values, resize_pixel_layers=True):
             )
             excluded_layers.append(layer.layer_id)
             layer_images.append((field, layer, layer_image))
-        elif PSDLayer(layer.kind) is PSDLayer.PIXEL:
+        else:
             layer_image = None
             if is_url(input_value):
                 request_url = urlopen(input_value)
@@ -78,7 +78,7 @@ def apply_template(template, content_values, resize_pixel_layers=True):
         if PSDLayer(layer.kind) is PSDLayer.TYPE:
             # value in this context is text
             position = __get_text_poisition_by_aligment(layer, layer_image)
-        elif PSDLayer(layer.kind) is PSDLayer.PIXEL:
+        else:
             if resize_pixel_layers:
                 layer_image = layer_image.resize(size)
             else:

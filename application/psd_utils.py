@@ -28,7 +28,10 @@ def get_editable_psd_layers(psd_file_path):
     """
     psd = getPSD(psd_file_path)
     all_psd_layers = get_all_psd_layers(psd)
-    editable_types = PSDLayer.TYPE, PSDLayer.PIXEL
+    editable_types = (
+        PSDLayer.TYPE, PSDLayer.PIXEL, PSDLayer.SHAPE,
+        PSDLayer.SMART_OBJECT, PSDLayer.PSD_IMAGE
+    )
     editable_psd_layers = []
     for layer in all_psd_layers:
         id_ = layer.layer_id

@@ -231,7 +231,11 @@ function setListPSDLayers(layers) {
                 + 'id="psd-layer-' + id + '-tag" value="' + name + '" required>'
                 + '</div>'
                 + '<div class="list-psd-layer-input col-5"></div></div></a>');
-            if (layer['type'] == 'pixel') {
+            if (layer['type'] == 'type') {
+                let $textInput = $('<input type="text" class="form-control" id="psd-layer-' + id + '-value" '
+                    + 'placeholder="Valor padrão do campo">');
+                $textInput.appendTo($item.find(listPSDLayerInputSelector));
+            } else {
                 let $imageInputGroup = $('<div class="input-group">'
                     + '<div class= "custom-file">'
                     + '<input id="psd-layer-'+ id + '-value" type="file" class="psd-layer-pixel-input-file custom-file-input">'
@@ -240,10 +244,6 @@ function setListPSDLayers(layers) {
                     + '</label>'
                     + '</div></div>');
                 $imageInputGroup.appendTo($item.find(listPSDLayerInputSelector));
-            } else if (layer['type'] == 'type') {
-                let $textInput = $('<input type="text" class="form-control" id="psd-layer-' + id + '-value" '
-                    + 'placeholder="Valor padrão do campo">');
-                $textInput.appendTo($item.find(listPSDLayerInputSelector));
             }
             htmlContent += $item.prop('outerHTML');
         }
