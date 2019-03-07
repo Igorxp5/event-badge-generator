@@ -137,6 +137,7 @@ def handle_send_data(input_layers_data):
         result.append(image_data)
 
         progress = 0.6 + ((index + 1) / totalData) * 0.2
+        print(f'Client \'{request.sid}\' Progress: {progress * 100}%')
         io.emit('converting_images_progress', {'progress': progress})
 
     io.emit('converted_images', {'images': result})
